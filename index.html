@@ -279,15 +279,23 @@
             console.log("Sending to Database:", payload);
             alert("Meal ready to be inserted! Check console.");
             
-            /* FUTURE VERCEL API CALL:
-            fetch('/api/add-meal', {
+            // Send the data to your new Python API
+            fetch('/api/add_meal', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            });
-            */
-            this.reset();
-        });
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "success") {
+                    alert("Awesome! Meal saved to the database.");
+                } else {
+                    alert("Uh oh, database error: " + data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+                        this.reset();
+                    });
     </script>
 </body>
 </html>
