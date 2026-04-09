@@ -469,7 +469,7 @@
         document.getElementById('workoutDate').value = today;
         document.getElementById('weightDate').value = today;
 
-        let currentUserId = localStorage.getItem('selectedUserId') || '1';
+        let currentUserId = localStorage.getItem('selectedUserId') || null;
         let userStats = { bmr: 0, target: 0, goal: 'Maintain', current: {} };
         let dailyTotals = { consumed: 0, burned: 0 };
 
@@ -514,6 +514,12 @@
                 if(data.status !== "success") return;
                 const selector = document.getElementById('userSelector');
                 selector.innerHTML = '';
+                
+                if (data.data.length > 0 && !currentUserId) {
+                    currentUserId = data.data[0].UserID;
+                    localStorage.setItem('selectedUserId', currentUserId);
+                }
+
                 data.data.forEach(u => {
                     const opt = document.createElement('option');
                     opt.value = u.UserID;
@@ -521,6 +527,8 @@
                     if (u.UserID == currentUserId) opt.selected = true;
                     selector.appendChild(opt);
                 });
+                
+                loadDashboardData();
             });
         }
 
@@ -533,9 +541,9 @@
         document.getElementById('btnNewUser').addEventListener('click', () => {
             currentUserId = null;
             document.getElementById('profileForm').reset();
-            // Clear placeholders for new user
             ['username', 'userAge', 'userWeight', 'userHeight', 'logWeightVal'].forEach(id => {
                 document.getElementById(id).placeholder = '--';
+                document.getElementById(id).value = '';
             });
             switchView('profile', document.querySelector('.nav-link:nth-child(4)'));
         });
@@ -543,8 +551,8 @@
         // --- WEIGHT LOGGING ---
         document.getElementById('weightForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const val = document.getElementById('logWeightVal').value || document.getElementById('logWeightVal').placeholder;
-            if (val === '--') return alert('Please enter a weight');
+            const val = document.getElementById('logWeightVal').value;
+            if (!val) return alert('Please enter a weight');
 
             const payload = {
                 user_id: currentUserId,
@@ -576,13 +584,10 @@
         document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Use current value or placeholder (greyed out value) if empty
-            const getVal = (id) => document.getElementById(id).value || document.getElementById(id).placeholder;
-            
-            const username = getVal('username');
-            const age = parseInt(getVal('userAge'));
-            const weight = parseFloat(getVal('userWeight'));
-            const height = parseFloat(getVal('userHeight'));
+            const username = document.getElementById('username').value || document.getElementById('username').placeholder;
+            const age = parseInt(document.getElementById('userAge').value || document.getElementById('userAge').placeholder);
+            const weight = parseFloat(document.getElementById('userWeight').value || document.getElementById('userWeight').placeholder);
+            const height = parseFloat(document.getElementById('userHeight').value || document.getElementById('userHeight').placeholder);
             const gender = document.getElementById('userGender').value;
             const goal = document.getElementById('userGoal').value;
             const manualTarget = document.getElementById('manualTarget').value;
@@ -607,9 +612,8 @@
             }).then(res => res.json()).then(data => { 
                 if(data.status === "success") {
                     loadUserList(); 
-                    loadDashboardData(); 
                     alert("Profile Updated!");
-                    e.target.reset(); // Clear inputs to show new placeholders
+                    e.target.reset();
                 }
             });
         });
@@ -704,34 +708,39 @@
                     userStats.goal = u.FitnessGoal;
                     userStats.current = u;
 
-                    document.getElementById('displayGoal').innerText = u.FitnessGoal;
-                    document.getElementById('displayBMR').innerText = u.CalculatedBMR + " kcal";
-                    document.getElementById('displayTarget').innerText = u.TargetCalories + " kcal";
+                    document.getElementById('displayGoal').innerText = u.FitnessGoal || "---";
+                    document.getElementById('displayBMR').innerText = (u.CalculatedBMR || 0) + " kcal";
+                    document.getElementById('displayTarget').innerText = (u.TargetCalories || 0) + " kcal";
                     
                     // Profile Placeholders (Greyed out current values)
-                    document.getElementById('username').placeholder = u.Username;
-                    document.getElementById('userAge').placeholder = u.Age;
-                    document.getElementById('userWeight').placeholder = u.WeightKG;
-                    document.getElementById('userHeight').placeholder = u.HeightCM;
-                    document.getElementById('userGender').value = u.Gender;
-                    document.getElementById('userGoal').value = u.FitnessGoal;
-                    document.getElementById('manualTarget').placeholder = u.TargetCalories;
-                    document.getElementById('logWeightVal').placeholder = u.WeightKG;
+                    document.getElementById('username').placeholder = u.Username || "--";
+                    document.getElementById('userAge').placeholder = u.Age || "--";
+                    document.getElementById('userWeight').placeholder = u.WeightKG || "--";
+                    document.getElementById('userHeight').placeholder = u.HeightCM || "--";
+                    document.getElementById('userGender').value = u.Gender || "M";
+                    document.getElementById('userGoal').value = u.FitnessGoal || "Maintain";
+                    document.getElementById('manualTarget').placeholder = u.TargetCalories || "--";
+                    document.getElementById('logWeightVal').placeholder = u.WeightKG || "--";
 
                     // BMI Calculation
-                    const bmi = (u.WeightKG / ((u.HeightCM / 100) ** 2)).toFixed(1);
-                    document.getElementById('bmiDisplay').innerText = bmi;
+                    if (u.WeightKG && u.HeightCM) {
+                        const bmi = (u.WeightKG / ((u.HeightCM / 100) ** 2)).toFixed(1);
+                        document.getElementById('bmiDisplay').innerText = bmi;
+                    } else {
+                        document.getElementById('bmiDisplay').innerText = "---";
+                    }
 
-                    // Trigger deficit update once stats are loaded
                     loadMeals();
                     loadWorkouts();
+                } else {
+                    console.error("User fetch failed:", data.message);
                 }
-            });
+            }).catch(err => console.error("Fetch error:", err));
 
             loadWeightHistory();
         }
 
-        window.onload = () => { loadUserList(); loadDashboardData(); };
+        window.onload = () => { loadUserList(); };
     </script>
 </body>
 </html>
