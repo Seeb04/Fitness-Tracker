@@ -15,12 +15,12 @@ class handler(BaseHTTPRequestHandler):
                 user=os.environ.get("DB_USER"),
                 password=os.environ.get("DB_PASSWORD"),
                 database=os.environ.get("DB_NAME"),
-                port=os.environ.get("DB_PORT", 25060)
+                port=os.environ.get("DB_PORT", 15463)
             )
             cursor = connection.cursor(dictionary=True)
             
             query = """
-                SELECT DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
+                SELECT WorkoutID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
                     WorkoutCategory, DurationMinutes, CaloriesBurned 
                 FROM Workouts WHERE UserID = %s ORDER BY WorkoutID DESC LIMIT 10
             """

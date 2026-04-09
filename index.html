@@ -363,6 +363,23 @@
             }
         }
 
+        function deleteEntry(id, type) {
+            if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
+            fetch('/api/delete_entry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: currentUserId, entry_id: id, type: type })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    loadDashboardData();
+                } else {
+                    alert("Failed to delete: " + data.message);
+                }
+            });
+        }
+
         // --- FETCH ALL USERS ---
         function loadUserList() {
             fetch('/api/get_users')
@@ -493,7 +510,7 @@
                 dailyTotals.consumed = 0;
                 data.data.forEach(m => {
                     if (m.LogDate === today) dailyTotals.consumed += m.Calories;
-                    tbody.innerHTML += `<tr><td>${m.LogDate}</td><td>${m.FoodItem}</td><td>${m.Calories}</td><td>${m.ProteinGrams}/${m.CarbsGrams}/${m.FatsGrams}</td><td><button class="btn-delete">X</button></td></tr>`;
+                    tbody.innerHTML += `<tr><td>${m.LogDate}</td><td>${m.FoodItem}</td><td>${m.Calories}</td><td>${m.ProteinGrams}/${m.CarbsGrams}/${m.FatsGrams}</td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">X</button></td></tr>`;
                 });
                 updateNetDeficit();
             });
