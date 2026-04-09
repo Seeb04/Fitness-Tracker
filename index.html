@@ -422,6 +422,57 @@
                 } else alert("Database error: " + data.message);
             }).catch(error => console.error('Error:', error));
         });
+
+        // --- 4. LOAD DATA ON PAGE LOAD ---
+        function loadDashboardData() {
+            // Fetch and inject Meals
+            fetch('/api/get_meals')
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "success") {
+                    const tbody = document.getElementById('mealTableBody');
+                    tbody.innerHTML = ''; // Wipes out the hardcoded HTML dummy data
+                    
+                    // Loop through the database records and build new table rows
+                    data.data.forEach(meal => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${meal.LogDate}</td>
+                                <td>${meal.FoodItem}</td>
+                                <td>${meal.Calories}</td>
+                                <td>${meal.ProteinGrams} / ${meal.CarbsGrams} / ${meal.FatsGrams}</td>
+                                <td><button class="btn-delete">X</button></td>
+                            </tr>
+                        `;
+                    });
+                }
+            });
+
+            // Fetch and inject Workouts
+            fetch('/api/get_workouts')
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "success") {
+                    const tbody = document.getElementById('workoutTableBody');
+                    tbody.innerHTML = ''; 
+                    
+                    data.data.forEach(workout => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${workout.LogDate}</td>
+                                <td>${workout.WorkoutCategory}</td>
+                                <td>${workout.DurationMinutes}m</td>
+                                <td>${workout.CaloriesBurned}</td>
+                                <td><button class="btn-delete">X</button></td>
+                            </tr>
+                        `;
+                    });
+                }
+            });
+        }
+
+        // Trigger the function automatically when the browser finishes loading the HTML
+        window.onload = loadDashboardData;
     </script>
 </body>
 </html>
