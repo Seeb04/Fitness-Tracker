@@ -523,7 +523,7 @@
                 dailyTotals.burned = 0;
                 data.data.forEach(w => {
                     if (w.LogDate === today) dailyTotals.burned += w.CaloriesBurned;
-                    tbody.innerHTML += `<tr><td>${w.LogDate}</td><td>${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete">X</button></td></tr>`;
+                    tbody.innerHTML += `<tr><td>${w.LogDate}</td><td>${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">X</button></td></tr>`;
                 });
                 updateNetDeficit();
             });
