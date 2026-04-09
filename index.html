@@ -508,9 +508,11 @@
 
         // --- FETCH ALL USERS ---
         function loadUserList() {
+            console.log("Fetching users...");
             fetch('/api/get_users')
             .then(res => res.json())
             .then(data => {
+                console.log("Users received:", data);
                 if(data.status !== "success") return;
                 const selector = document.getElementById('userSelector');
                 selector.innerHTML = '';
@@ -529,7 +531,7 @@
                 });
                 
                 loadDashboardData();
-            });
+            }).catch(err => console.error("Error loading user list:", err));
         }
 
         document.getElementById('userSelector').addEventListener('change', (e) => {
@@ -551,8 +553,8 @@
         // --- WEIGHT LOGGING ---
         document.getElementById('weightForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const val = document.getElementById('logWeightVal').value;
-            if (!val) return alert('Please enter a weight');
+            const val = document.getElementById('logWeightVal').value || document.getElementById('logWeightVal').placeholder;
+            if (val === '--' || !val) return alert('Please enter a weight');
 
             const payload = {
                 user_id: currentUserId,
@@ -584,10 +586,12 @@
         document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const username = document.getElementById('username').value || document.getElementById('username').placeholder;
-            const age = parseInt(document.getElementById('userAge').value || document.getElementById('userAge').placeholder);
-            const weight = parseFloat(document.getElementById('userWeight').value || document.getElementById('userWeight').placeholder);
-            const height = parseFloat(document.getElementById('userHeight').value || document.getElementById('userHeight').placeholder);
+            const getVal = (id) => document.getElementById(id).value || document.getElementById(id).placeholder;
+            
+            const username = getVal('username');
+            const age = parseInt(getVal('userAge'));
+            const weight = parseFloat(getVal('userWeight'));
+            const height = parseFloat(getVal('userHeight'));
             const gender = document.getElementById('userGender').value;
             const goal = document.getElementById('userGoal').value;
             const manualTarget = document.getElementById('manualTarget').value;
@@ -664,7 +668,7 @@
                 const tbody = document.getElementById('mealTableBody');
                 tbody.innerHTML = '';
                 if (!days) dailyTotals.consumed = 0;
-                if(data.status === "success") {
+                if(data.status === "success" && data.data) {
                     data.data.forEach(m => {
                         if (!days && m.LogDate === today) dailyTotals.consumed += m.Calories;
                         tbody.innerHTML += `<tr><td>${m.LogDate}</td><td>${m.FoodItem}</td><td>${m.Calories}</td><td>${m.ProteinGrams}/${m.CarbsGrams}/${m.FatsGrams}</td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">X</button></td></tr>`;
@@ -684,7 +688,7 @@
                 const tbody = document.getElementById('workoutTableBody');
                 tbody.innerHTML = '';
                 if (!days) dailyTotals.burned = 0;
-                if(data.status === "success") {
+                if(data.status === "success" && data.data) {
                     data.data.forEach(w => {
                         if (!days && w.LogDate === today) dailyTotals.burned += w.CaloriesBurned;
                         tbody.innerHTML += `<tr><td>${w.LogDate}</td><td>${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">X</button></td></tr>`;
@@ -697,10 +701,12 @@
         // --- DASHBOARD REFRESH ---
         function loadDashboardData() {
             if (!currentUserId) return;
+            console.log("Loading dashboard for user:", currentUserId);
             
             fetch(`/api/get_user?user_id=${currentUserId}`)
             .then(res => res.json())
             .then(data => {
+                console.log("User data received:", data);
                 if(data.status === "success") {
                     const u = data.data;
                     userStats.bmr = u.CalculatedBMR;
@@ -732,10 +738,8 @@
 
                     loadMeals();
                     loadWorkouts();
-                } else {
-                    console.error("User fetch failed:", data.message);
                 }
-            }).catch(err => console.error("Fetch error:", err));
+            }).catch(err => console.error("Error loading dashboard data:", err));
 
             loadWeightHistory();
         }
