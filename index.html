@@ -404,7 +404,7 @@
                     <form id="profileForm">
                         <div class="form-group">
                             <label>Display Name</label>
-                            <input type="text" id="username" placeholder="Haseeb" required>
+                            <input type="text" id="username" placeholder="--" required>
                         </div>
                         <div style="display: flex; gap: 1rem;">
                             <div class="form-group" style="flex: 1;">
@@ -422,11 +422,11 @@
                         <div style="display: flex; gap: 1rem;">
                             <div class="form-group" style="flex: 1;">
                                 <label>Weight (kg)</label>
-                                <input type="number" step="0.1" id="userWeight" placeholder="0.0" required>
+                                <input type="number" step="0.1" id="userWeight" placeholder="--" required>
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label>Height (cm)</label>
-                                <input type="number" step="0.1" id="userHeight" placeholder="0.0" required>
+                                <input type="number" step="0.1" id="userHeight" placeholder="--" required>
                             </div>
                         </div>
                         <div class="form-group">
@@ -454,7 +454,7 @@
                         </div>
                         <div class="form-group">
                             <label>Current Weight (kg)</label>
-                            <input type="number" step="0.1" id="logWeightVal" required>
+                            <input type="number" step="0.1" id="logWeightVal" placeholder="--" required>
                         </div>
                         <button type="submit">Update Weight</button>
                     </form>
@@ -470,7 +470,7 @@
         document.getElementById('weightDate').value = today;
 
         let currentUserId = localStorage.getItem('selectedUserId') || '1';
-        let userStats = { bmr: 0, target: 0, goal: 'Maintain' };
+        let userStats = { bmr: 0, target: 0, goal: 'Maintain', current: {} };
         let dailyTotals = { consumed: 0, burned: 0 };
 
         function switchView(viewId, el) {
@@ -511,6 +511,7 @@
             fetch('/api/get_users')
             .then(res => res.json())
             .then(data => {
+                if(data.status !== "success") return;
                 const selector = document.getElementById('userSelector');
                 selector.innerHTML = '';
                 data.data.forEach(u => {
@@ -532,16 +533,23 @@
         document.getElementById('btnNewUser').addEventListener('click', () => {
             currentUserId = null;
             document.getElementById('profileForm').reset();
-            switchView('profile', document.querySelector('.nav-link:nth-child(5)'));
+            // Clear placeholders for new user
+            ['username', 'userAge', 'userWeight', 'userHeight', 'logWeightVal'].forEach(id => {
+                document.getElementById(id).placeholder = '--';
+            });
+            switchView('profile', document.querySelector('.nav-link:nth-child(4)'));
         });
 
         // --- WEIGHT LOGGING ---
         document.getElementById('weightForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const val = document.getElementById('logWeightVal').value || document.getElementById('logWeightVal').placeholder;
+            if (val === '--') return alert('Please enter a weight');
+
             const payload = {
                 user_id: currentUserId,
                 date: document.getElementById('weightDate').value,
-                weight: document.getElementById('logWeightVal').value
+                weight: val
             };
             fetch('/api/add_weight', {
                 method: 'POST',
@@ -556,29 +564,39 @@
             .then(data => {
                 const list = document.getElementById('weightHistoryList');
                 list.innerHTML = '';
-                data.data.forEach(w => {
-                    list.innerHTML += `<div>${w.LogDate}: <strong>${w.WeightKG} kg</strong></div>`;
-                });
+                if(data.status === "success") {
+                    data.data.forEach(w => {
+                        list.innerHTML += `<div>${w.LogDate}: <strong>${w.WeightKG} kg</strong></div>`;
+                    });
+                }
             });
         }
 
         // --- PROFILE SUBMISSION ---
         document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const age = parseInt(document.getElementById('userAge').value);
-            const weight = parseFloat(document.getElementById('userWeight').value);
-            const height = parseFloat(document.getElementById('userHeight').value);
+            
+            // Use current value or placeholder (greyed out value) if empty
+            const getVal = (id) => document.getElementById(id).value || document.getElementById(id).placeholder;
+            
+            const username = getVal('username');
+            const age = parseInt(getVal('userAge'));
+            const weight = parseFloat(getVal('userWeight'));
+            const height = parseFloat(getVal('userHeight'));
             const gender = document.getElementById('userGender').value;
             const goal = document.getElementById('userGoal').value;
             const manualTarget = document.getElementById('manualTarget').value;
+
+            if (isNaN(age) || isNaN(weight) || isNaN(height)) {
+                return alert("Please fill in all biometric fields");
+            }
 
             let bmr = Math.round((10 * weight) + (6.25 * height) - (5 * age) + (gender === 'M' ? 5 : -161));
             let targetCalories = manualTarget ? parseInt(manualTarget) : Math.round(bmr * 1.2 + (goal === 'Cut' ? -500 : goal === 'Bulk' ? 500 : 0));
 
             const payload = { 
                 user_id: currentUserId,
-                username: document.getElementById('username').value,
-                age, weight, height, gender, goal, bmr, 
+                username, age, weight, height, gender, goal, bmr, 
                 target_calories: targetCalories 
             };
 
@@ -586,7 +604,14 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            }).then(() => { loadUserList(); loadDashboardData(); alert("Profile Updated!"); });
+            }).then(res => res.json()).then(data => { 
+                if(data.status === "success") {
+                    loadUserList(); 
+                    loadDashboardData(); 
+                    alert("Profile Updated!");
+                    e.target.reset(); // Clear inputs to show new placeholders
+                }
+            });
         });
 
         // --- DATA LOGGING ---
@@ -635,10 +660,12 @@
                 const tbody = document.getElementById('mealTableBody');
                 tbody.innerHTML = '';
                 if (!days) dailyTotals.consumed = 0;
-                data.data.forEach(m => {
-                    if (!days && m.LogDate === today) dailyTotals.consumed += m.Calories;
-                    tbody.innerHTML += `<tr><td>${m.LogDate}</td><td>${m.FoodItem}</td><td>${m.Calories}</td><td>${m.ProteinGrams}/${m.CarbsGrams}/${m.FatsGrams}</td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">X</button></td></tr>`;
-                });
+                if(data.status === "success") {
+                    data.data.forEach(m => {
+                        if (!days && m.LogDate === today) dailyTotals.consumed += m.Calories;
+                        tbody.innerHTML += `<tr><td>${m.LogDate}</td><td>${m.FoodItem}</td><td>${m.Calories}</td><td>${m.ProteinGrams}/${m.CarbsGrams}/${m.FatsGrams}</td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">X</button></td></tr>`;
+                    });
+                }
                 updateNetDeficit();
             });
         }
@@ -653,10 +680,12 @@
                 const tbody = document.getElementById('workoutTableBody');
                 tbody.innerHTML = '';
                 if (!days) dailyTotals.burned = 0;
-                data.data.forEach(w => {
-                    if (!days && w.LogDate === today) dailyTotals.burned += w.CaloriesBurned;
-                    tbody.innerHTML += `<tr><td>${w.LogDate}</td><td>${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">X</button></td></tr>`;
-                });
+                if(data.status === "success") {
+                    data.data.forEach(w => {
+                        if (!days && w.LogDate === today) dailyTotals.burned += w.CaloriesBurned;
+                        tbody.innerHTML += `<tr><td>${w.LogDate}</td><td>${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">X</button></td></tr>`;
+                    });
+                }
                 updateNetDeficit();
             });
         }
@@ -670,27 +699,35 @@
             .then(data => {
                 if(data.status === "success") {
                     const u = data.data;
-                    userStats = { bmr: u.CalculatedBMR, target: u.TargetCalories, goal: u.FitnessGoal };
+                    userStats.bmr = u.CalculatedBMR;
+                    userStats.target = u.TargetCalories;
+                    userStats.goal = u.FitnessGoal;
+                    userStats.current = u;
+
                     document.getElementById('displayGoal').innerText = u.FitnessGoal;
                     document.getElementById('displayBMR').innerText = u.CalculatedBMR + " kcal";
                     document.getElementById('displayTarget').innerText = u.TargetCalories + " kcal";
                     
-                    document.getElementById('username').value = u.Username;
-                    document.getElementById('userAge').value = u.Age;
-                    document.getElementById('userWeight').value = u.WeightKG;
-                    document.getElementById('userHeight').value = u.HeightCM;
+                    // Profile Placeholders (Greyed out current values)
+                    document.getElementById('username').placeholder = u.Username;
+                    document.getElementById('userAge').placeholder = u.Age;
+                    document.getElementById('userWeight').placeholder = u.WeightKG;
+                    document.getElementById('userHeight').placeholder = u.HeightCM;
                     document.getElementById('userGender').value = u.Gender;
                     document.getElementById('userGoal').value = u.FitnessGoal;
-                    document.getElementById('manualTarget').value = u.TargetCalories;
+                    document.getElementById('manualTarget').placeholder = u.TargetCalories;
+                    document.getElementById('logWeightVal').placeholder = u.WeightKG;
 
                     // BMI Calculation
                     const bmi = (u.WeightKG / ((u.HeightCM / 100) ** 2)).toFixed(1);
                     document.getElementById('bmiDisplay').innerText = bmi;
+
+                    // Trigger deficit update once stats are loaded
+                    loadMeals();
+                    loadWorkouts();
                 }
             });
 
-            loadMeals();
-            loadWorkouts();
             loadWeightHistory();
         }
 
