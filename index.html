@@ -296,6 +296,39 @@
             .catch(error => console.error('Error:', error));
                         this.reset();
                     });
+
+            // Listen for the Workout Form submission
+        document.getElementById('workoutForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Stop page refresh
+            
+            // Gather the data from the workout input fields
+            const payload = {
+                date: document.getElementById('workoutDate').value,
+                type: document.getElementById('workoutType').value,
+                calories: document.getElementById('workoutCals').value
+            };
+
+            console.log("Sending Workout to Database:", payload);
+
+            // Call your new Python script on Vercel
+            fetch('/api/add_workout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "success") {
+                    alert("Boom! Workout saved to the database.");
+                } else {
+                    alert("Uh oh, database error: " + data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+
+            // Clear the form after clicking submit
+            this.reset();
+        });
     </script>
 </body>
 </html>
