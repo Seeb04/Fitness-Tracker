@@ -13,6 +13,7 @@
             --text-light: #F8FAFC;
             --text-muted: #94A3B8;
             --danger: #EF4444;
+            --success: #10B981;
             --border-radius: 12px;
         }
 
@@ -34,7 +35,6 @@
             gap: 2rem;
         }
 
-        /* Header Span */
         .header {
             grid-column: 1 / -1;
             display: flex;
@@ -55,7 +55,6 @@
             color: var(--text-muted);
         }
 
-        /* Cards & Containers */
         .card {
             background-color: var(--surface);
             padding: 1.5rem;
@@ -72,7 +71,6 @@
             padding-bottom: 0.5rem;
         }
 
-        /* KPI Specific */
         .kpi {
             text-align: center;
         }
@@ -83,7 +81,6 @@
             margin: 0.5rem 0;
         }
 
-        /* Forms */
         .form-group {
             margin-bottom: 1rem;
             display: flex;
@@ -127,7 +124,6 @@
             background-color: var(--primary-hover);
         }
 
-        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -165,15 +161,15 @@
         <div class="header">
             <h1>Fitness & Macro Tracker</h1>
             <div class="header-stats">
-                Goal: <span id="displayGoal">Cut</span> | Target: <strong id="displayTarget" style="color: var(--primary);">1630 kcal</strong> | BMR: <strong id="displayBMR" style="color: #fff;">1775 kcal</strong>
+                Goal: <span id="displayGoal">---</span> | Target: <strong id="displayTarget" style="color: var(--primary);">--- kcal</strong> | BMR: <strong id="displayBMR" style="color: #fff;">--- kcal</strong>
             </div>
         </div>
 
         <div class="col-left">
             <div class="card kpi">
-                <h2>Today's Net Deficit</h2>
-                <div class="kpi-value">-350 kcal</div>
-                <small style="color: var(--text-muted);">Goal: Hit Target Calorie Deficit</small>
+                <h2>Today's Net Status</h2>
+                <div id="netDeficitDisplay" class="kpi-value">0 kcal</div>
+                <small id="netStatusLabel" style="color: var(--text-muted);">Calculating...</small>
             </div>
 
             <div class="card">
@@ -182,7 +178,7 @@
                     <div style="display: flex; gap: 1rem;">
                         <div class="form-group" style="flex: 1;">
                             <label>Age</label>
-                            <input type="number" id="userAge" placeholder="e.g., 22" required>
+                            <input type="number" id="userAge" placeholder="22" required>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>Gender</label>
@@ -223,7 +219,7 @@
                     </div>
                     <div class="form-group">
                         <label>Food Item</label>
-                        <input type="text" id="foodItem" placeholder="e.g., Grilled Chicken Rice" required>
+                        <input type="text" id="foodItem" placeholder="e.g., Chicken & Rice" required>
                     </div>
                     <div class="form-group">
                         <label>Total Calories</label>
@@ -232,15 +228,15 @@
                     <div style="display: flex; gap: 0.5rem;">
                         <div class="form-group" style="flex: 1;">
                             <label>Protein (g)</label>
-                            <input type="number" id="mealProtein" placeholder="0">
+                            <input type="number" id="mealProtein" value="0">
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>Carbs (g)</label>
-                            <input type="number" id="mealCarbs" placeholder="0">
+                            <input type="number" id="mealCarbs" value="0">
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>Fats (g)</label>
-                            <input type="number" id="mealFats" placeholder="0">
+                            <input type="number" id="mealFats" value="0">
                         </div>
                     </div>
                     <button type="submit">Add Meal</button>
@@ -293,13 +289,7 @@
                         </tr>
                     </thead>
                     <tbody id="mealTableBody">
-                        <tr>
-                            <td>2026-04-09</td>
-                            <td>Chicken Tikka & Naan</td>
-                            <td>650</td>
-                            <td>45 / 60 / 20</td>
-                            <td><button class="btn-delete">X</button></td>
-                        </tr>
+                        <tr><td colspan="5">Loading meals...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -317,13 +307,7 @@
                         </tr>
                     </thead>
                     <tbody id="workoutTableBody">
-                        <tr>
-                            <td>2026-04-09</td>
-                            <td>PPL - Push Day</td>
-                            <td>60m</td>
-                            <td>320</td>
-                            <td><button class="btn-delete">X</button></td>
-                        </tr>
+                        <tr><td colspan="5">Loading workouts...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -331,7 +315,33 @@
     </div>
 
     <script>
-        // --- 1. PROFILE & BIOMETRICS SUBMISSION ---
+        // Set default dates to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('mealDate').value = today;
+        document.getElementById('workoutDate').value = today;
+
+        let userStats = { bmr: 0, target: 0, goal: 'Maintain' };
+        let dailyTotals = { consumed: 0, burned: 0 };
+
+        function updateNetDeficit() {
+            const net = dailyTotals.consumed - dailyTotals.burned;
+            const status = net - userStats.target;
+            
+            const display = document.getElementById('netDeficitDisplay');
+            const label = document.getElementById('netStatusLabel');
+            
+            display.innerText = `${Math.abs(status)} kcal`;
+            
+            if (status <= 0) {
+                display.style.color = 'var(--success)';
+                label.innerText = 'Below Target Limit';
+            } else {
+                display.style.color = 'var(--danger)';
+                label.innerText = 'Over Daily Target';
+            }
+        }
+
+        // --- 1. PROFILE & BIOMETRICS ---
         document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -341,47 +351,46 @@
             const gender = document.getElementById('userGender').value;
             const goal = document.getElementById('userGoal').value;
 
-            // Mifflin-St Jeor BMR Calculation
             let bmr = (10 * weight) + (6.25 * height) - (5 * age);
             bmr = gender === 'M' ? bmr + 5 : bmr - 161;
             bmr = Math.round(bmr);
 
-            // Calculate Target Calories (Assuming light activity multiplier of 1.2)
             let targetCalories = bmr * 1.2;
             if (goal === 'Cut') targetCalories -= 500;
             if (goal === 'Bulk') targetCalories += 500;
             targetCalories = Math.round(targetCalories);
 
-            // Update UI instantly
+            userStats = { bmr, target: targetCalories, goal };
+            
             document.getElementById('displayGoal').innerText = goal;
             document.getElementById('displayBMR').innerText = bmr + " kcal";
             document.getElementById('displayTarget').innerText = targetCalories + " kcal";
 
-            const payload = { age, weight, height, gender, goal, bmr, target_calories: targetCalories };
-
             fetch('/api/add_user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ age, weight, height, gender, goal, bmr, target_calories: targetCalories })
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                if(data.status === "success") alert("Profile updated! BMR and Targets saved to database.");
-                else alert("Database error: " + data.message);
-            }).catch(error => console.error('Error:', error));
+                if(data.status === "success") {
+                    alert("Profile updated!");
+                    updateNetDeficit();
+                } else alert("Error: " + data.message);
+            });
         });
 
         // --- 2. MEAL SUBMISSION ---
         document.getElementById('mealForm').addEventListener('submit', function(e) {
             e.preventDefault(); 
-            
+            const form = e.target;
             const payload = {
                 date: document.getElementById('mealDate').value,
                 food: document.getElementById('foodItem').value,
                 calories: document.getElementById('mealCals').value,
-                protein: document.getElementById('mealProtein').value || 0,
-                carbs: document.getElementById('mealCarbs').value || 0,
-                fats: document.getElementById('mealFats').value || 0
+                protein: document.getElementById('mealProtein').value,
+                carbs: document.getElementById('mealCarbs').value,
+                fats: document.getElementById('mealFats').value
             };
 
             fetch('/api/add_meal', {
@@ -389,19 +398,20 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if(data.status === "success") {
-                    alert("Awesome! Meal and macros saved to the database.");
-                    this.reset();
-                } else alert("Database error: " + data.message);
-            }).catch(error => console.error('Error:', error));
+                    form.reset();
+                    document.getElementById('mealDate').value = today;
+                    loadDashboardData();
+                }
+            });
         });
 
         // --- 3. WORKOUT SUBMISSION ---
         document.getElementById('workoutForm').addEventListener('submit', function(e) {
             e.preventDefault(); 
-            
+            const form = e.target;
             const payload = {
                 date: document.getElementById('workoutDate').value,
                 category: document.getElementById('workoutCategory').value,
@@ -414,27 +424,48 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if(data.status === "success") {
-                    alert("Boom! Workout saved to the database.");
-                    this.reset();
-                } else alert("Database error: " + data.message);
-            }).catch(error => console.error('Error:', error));
+                    form.reset();
+                    document.getElementById('workoutDate').value = today;
+                    loadDashboardData();
+                }
+            });
         });
 
-        // --- 4. LOAD DATA ON PAGE LOAD ---
+        // --- 4. LOAD DATA ---
         function loadDashboardData() {
-            // Fetch and inject Meals
+            // Fetch User
+            fetch('/api/get_user')
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    const u = data.data;
+                    userStats = { bmr: u.CalculatedBMR, target: u.TargetCalories, goal: u.FitnessGoal };
+                    document.getElementById('displayGoal').innerText = u.FitnessGoal;
+                    document.getElementById('displayBMR').innerText = u.CalculatedBMR + " kcal";
+                    document.getElementById('displayTarget').innerText = u.TargetCalories + " kcal";
+                    
+                    // Fill form with current data
+                    document.getElementById('userAge').value = u.Age;
+                    document.getElementById('userWeight').value = u.WeightKG;
+                    document.getElementById('userHeight').value = u.HeightCM;
+                    document.getElementById('userGender').value = u.Gender;
+                    document.getElementById('userGoal').value = u.FitnessGoal;
+                }
+            });
+
+            // Fetch Meals
             fetch('/api/get_meals')
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if(data.status === "success") {
                     const tbody = document.getElementById('mealTableBody');
-                    tbody.innerHTML = ''; // Wipes out the hardcoded HTML dummy data
-                    
-                    // Loop through the database records and build new table rows
+                    tbody.innerHTML = '';
+                    dailyTotals.consumed = 0;
                     data.data.forEach(meal => {
+                        if (meal.LogDate === today) dailyTotals.consumed += meal.Calories;
                         tbody.innerHTML += `
                             <tr>
                                 <td>${meal.LogDate}</td>
@@ -445,33 +476,35 @@
                             </tr>
                         `;
                     });
+                    updateNetDeficit();
                 }
             });
 
-            // Fetch and inject Workouts
+            // Fetch Workouts
             fetch('/api/get_workouts')
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if(data.status === "success") {
                     const tbody = document.getElementById('workoutTableBody');
-                    tbody.innerHTML = ''; 
-                    
-                    data.data.forEach(workout => {
+                    tbody.innerHTML = '';
+                    dailyTotals.burned = 0;
+                    data.data.forEach(w => {
+                        if (w.LogDate === today) dailyTotals.burned += w.CaloriesBurned;
                         tbody.innerHTML += `
                             <tr>
-                                <td>${workout.LogDate}</td>
-                                <td>${workout.WorkoutCategory}</td>
-                                <td>${workout.DurationMinutes}m</td>
-                                <td>${workout.CaloriesBurned}</td>
+                                <td>${w.LogDate}</td>
+                                <td>${w.WorkoutCategory}</td>
+                                <td>${w.DurationMinutes}m</td>
+                                <td>${w.CaloriesBurned}</td>
                                 <td><button class="btn-delete">X</button></td>
                             </tr>
                         `;
                     });
+                    updateNetDeficit();
                 }
             });
         }
 
-        // Trigger the function automatically when the browser finishes loading the HTML
         window.onload = loadDashboardData;
     </script>
 </body>
