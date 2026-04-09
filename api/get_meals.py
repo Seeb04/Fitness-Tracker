@@ -9,22 +9,33 @@ class handler(BaseHTTPRequestHandler):
         try:
             query_params = parse_qs(urlparse(self.path).query)
             user_id = query_params.get('user_id', ['1'])[0]
+            days = query_params.get('days', [None])[0]
 
             connection = mysql.connector.connect(
                 host=os.environ.get("DB_HOST"),
                 user=os.environ.get("DB_USER"),
                 password=os.environ.get("DB_PASSWORD"),
                 database=os.environ.get("DB_NAME"),
-                port=os.environ.get("DB_PORT", 15463)
+                port=os.environ.get("DB_PORT", 25060)
             )
             cursor = connection.cursor(dictionary=True)
             
-            query = """
-                SELECT MealID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
-                    FoodItem, Calories, ProteinGrams, CarbsGrams, FatsGrams 
-                FROM Meals WHERE UserID = %s ORDER BY MealID DESC LIMIT 10
-            """
-            cursor.execute(query, (user_id,))
+            if days:
+                query = """
+                    SELECT MealID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
+                        FoodItem, Calories, ProteinGrams, CarbsGrams, FatsGrams 
+                    FROM Meals WHERE UserID = %s AND LogDate >= DATE_SUB(CURDATE(), INTERVAL %s DAY)
+                    ORDER BY LogDate DESC, MealID DESC
+                """
+                cursor.execute(query, (user_id, int(days)))
+            else:
+                query = """
+                    SELECT MealID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
+                        FoodItem, Calories, ProteinGrams, CarbsGrams, FatsGrams 
+                    FROM Meals WHERE UserID = %s ORDER BY LogDate DESC, MealID DESC LIMIT 10
+                """
+                cursor.execute(query, (user_id,))
+                
             meals = cursor.fetchall()
 
             self.send_response(200)

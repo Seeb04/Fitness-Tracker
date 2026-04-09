@@ -9,7 +9,6 @@ class handler(BaseHTTPRequestHandler):
         try:
             query_params = parse_qs(urlparse(self.path).query)
             user_id = query_params.get('user_id', ['1'])[0]
-            days = query_params.get('days', [None])[0]
 
             connection = mysql.connector.connect(
                 host=os.environ.get("DB_HOST"),
@@ -20,28 +19,14 @@ class handler(BaseHTTPRequestHandler):
             )
             cursor = connection.cursor(dictionary=True)
             
-            if days:
-                query = """
-                    SELECT WorkoutID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
-                        WorkoutCategory, DurationMinutes, CaloriesBurned 
-                    FROM Workouts WHERE UserID = %s AND LogDate >= DATE_SUB(CURDATE(), INTERVAL %s DAY)
-                    ORDER BY LogDate DESC, WorkoutID DESC
-                """
-                cursor.execute(query, (user_id, int(days)))
-            else:
-                query = """
-                    SELECT WorkoutID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
-                        WorkoutCategory, DurationMinutes, CaloriesBurned 
-                    FROM Workouts WHERE UserID = %s ORDER BY LogDate DESC, WorkoutID DESC LIMIT 10
-                """
-                cursor.execute(query, (user_id,))
-                
-            workouts = cursor.fetchall()
+            query = "SELECT DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, WeightKG FROM WeightLogs WHERE UserID = %s ORDER BY LogDate DESC LIMIT 10"
+            cursor.execute(query, (user_id,))
+            weights = cursor.fetchall()
 
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps({"status": "success", "data": workouts}).encode('utf-8'))
+            self.wfile.write(json.dumps({"status": "success", "data": weights}).encode('utf-8'))
 
         except Exception as e:
             self.send_response(500)

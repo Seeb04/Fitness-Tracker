@@ -13,9 +13,9 @@
 ## 🏗️ Phase 2: SaaS Upgrades (In Progress)
 
 ### 1. Advanced Data Management
-- [ ] **Delete Operations:** Implement `/api/delete_entry.py` for removing logs.
-- [ ] **Historical Analytics:** View logs by date range (7-day / 30-day views).
-- [ ] **Weight Tracking:** Dedicated weight-log table to track progress over time.
+- [x] **Delete Operations:** Implement `/api/delete_entry.py` for removing logs.
+- [x] **Historical Analytics:** View logs by date range (7-day / 30-day views).
+- [x] **Weight Tracking:** Dedicated weight-log table to track progress over time.
 
 ### 2. The Routine Builder
 - [ ] Create `Routines` and `Routine_Days` tables.
