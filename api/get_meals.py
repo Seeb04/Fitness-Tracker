@@ -11,7 +11,7 @@ class handler(BaseHTTPRequestHandler):
                 user=os.environ.get("DB_USER"),
                 password=os.environ.get("DB_PASSWORD"),
                 database=os.environ.get("DB_NAME"),
-                port=os.environ.get("DB_PORT", 25060)
+                port=os.environ.get("DB_PORT", 15463)
             )
             # dictionary=True makes the results format as JSON objects instead of raw arrays
             cursor = connection.cursor(dictionary=True)
