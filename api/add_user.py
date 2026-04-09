@@ -19,30 +19,31 @@ class handler(BaseHTTPRequestHandler):
             )
             cursor = connection.cursor()
 
-            # Updated Query to include Macros
-            insert_query = """
-                INSERT INTO Meals (UserID, LogDate, FoodItem, Calories, ProteinGrams, CarbsGrams, FatsGrams) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            # Update User 1's biometrics
+            update_query = """
+                UPDATE Users 
+                SET Age = %s, WeightKG = %s, HeightCM = %s, Gender = %s, 
+                    FitnessGoal = %s, CalculatedBMR = %s, TargetCalories = %s
+                WHERE UserID = 1
             """
             
-            # Assuming UserID 1 for MVP
             values = (
-                1, 
-                payload['date'], 
-                payload['food'], 
-                int(payload['calories']),
-                int(payload.get('protein', 0)),
-                int(payload.get('carbs', 0)),
-                int(payload.get('fats', 0))
+                int(payload['age']),
+                float(payload['weight']),
+                float(payload['height']),
+                payload['gender'],
+                payload['goal'],
+                int(payload['bmr']),
+                int(payload['target_calories'])
             )
             
-            cursor.execute(insert_query, values)
+            cursor.execute(update_query, values)
             connection.commit()
 
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps({"status": "success", "message": "Meal and macros logged!"}).encode('utf-8'))
+            self.wfile.write(json.dumps({"status": "success", "message": "Biometrics updated!"}).encode('utf-8'))
 
         except Exception as e:
             self.send_response(500)
