@@ -2,27 +2,29 @@ from http.server import BaseHTTPRequestHandler
 import json
 import mysql.connector
 import os
+from urllib.parse import urlparse, parse_qs
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
+            query_params = parse_qs(urlparse(self.path).query)
+            user_id = query_params.get('user_id', ['1'])[0]
+
             connection = mysql.connector.connect(
                 host=os.environ.get("DB_HOST"),
                 user=os.environ.get("DB_USER"),
                 password=os.environ.get("DB_PASSWORD"),
                 database=os.environ.get("DB_NAME"),
-                port=os.environ.get("DB_PORT", 15463)
+                port=os.environ.get("DB_PORT", 25060)
             )
-            # dictionary=True makes the results format as JSON objects instead of raw arrays
             cursor = connection.cursor(dictionary=True)
             
-            # We use DATE_FORMAT so Python doesn't crash trying to serialize a raw Date object
             query = """
                 SELECT DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
                     FoodItem, Calories, ProteinGrams, CarbsGrams, FatsGrams 
-                FROM Meals WHERE UserID = 1 ORDER BY MealID DESC LIMIT 10
+                FROM Meals WHERE UserID = %s ORDER BY MealID DESC LIMIT 10
             """
-            cursor.execute(query)
+            cursor.execute(query, (user_id,))
             meals = cursor.fetchall()
 
             self.send_response(200)
@@ -32,7 +34,6 @@ class handler(BaseHTTPRequestHandler):
 
         except Exception as e:
             self.send_response(500)
-            self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps({"status": "error", "message": str(e)}).encode('utf-8'))
         finally:

@@ -8,7 +8,7 @@
         :root {
             --bg-dark: #0B1120;
             --surface: #1E293B;
-            --primary: #0EA5E9; /* Lush Neon Blue */
+            --primary: #0EA5E9;
             --primary-hover: #38BDF8;
             --text-light: #F8FAFC;
             --text-muted: #94A3B8;
@@ -39,7 +39,7 @@
             grid-column: 1 / -1;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             border-bottom: 2px solid var(--surface);
             padding-bottom: 1rem;
         }
@@ -50,9 +50,10 @@
             color: var(--primary);
         }
 
-        .header-stats {
-            font-size: 1.1rem;
-            color: var(--text-muted);
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .card {
@@ -88,7 +89,7 @@
         }
 
         label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             margin-bottom: 0.3rem;
         }
@@ -97,9 +98,9 @@
             background-color: var(--bg-dark);
             border: 1px solid rgba(255,255,255,0.1);
             color: var(--text-light);
-            padding: 0.8rem;
+            padding: 0.7rem;
             border-radius: 6px;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         input:focus, select:focus {
@@ -139,46 +140,68 @@
         th {
             color: var(--text-muted);
             font-weight: normal;
+            font-size: 0.85rem;
         }
 
         .btn-delete {
             background-color: transparent;
             color: var(--danger);
             border: 1px solid var(--danger);
-            padding: 0.3rem 0.6rem;
+            padding: 0.2rem 0.5rem;
             width: auto;
+            margin-top: 0;
         }
         
         .btn-delete:hover {
             background-color: var(--danger);
             color: #fff;
         }
+
+        .stats-strip {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .stats-strip strong { color: #fff; }
     </style>
 </head>
 <body>
 
     <div class="dashboard">
         <div class="header">
-            <h1>Fitness & Macro Tracker</h1>
-            <div class="header-stats">
-                Goal: <span id="displayGoal">---</span> | Target: <strong id="displayTarget" style="color: var(--primary);">--- kcal</strong> | BMR: <strong id="displayBMR" style="color: #fff;">--- kcal</strong>
+            <div>
+                <h1>Fitness & Macro Tracker</h1>
+                <div class="stats-strip">
+                    <span>Goal: <strong id="displayGoal">---</strong></span>
+                    <span>BMR: <strong id="displayBMR">---</strong></span>
+                    <span>Target: <strong id="displayTarget" style="color: var(--primary);">---</strong></span>
+                </div>
+            </div>
+            <div class="user-controls">
+                <label style="margin-bottom: 0;">Profile:</label>
+                <select id="userSelector" style="padding: 0.4rem;"></select>
             </div>
         </div>
 
         <div class="col-left">
             <div class="card kpi">
-                <h2>Today's Net Status</h2>
+                <h2>Daily Status</h2>
                 <div id="netDeficitDisplay" class="kpi-value">0 kcal</div>
                 <small id="netStatusLabel" style="color: var(--text-muted);">Calculating...</small>
             </div>
 
             <div class="card">
-                <h2>Update Profile & Biometrics</h2>
+                <h2>Profile & Biometrics</h2>
                 <form id="profileForm">
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" id="username" placeholder="Haseeb" required>
+                    </div>
                     <div style="display: flex; gap: 1rem;">
                         <div class="form-group" style="flex: 1;">
                             <label>Age</label>
-                            <input type="number" id="userAge" placeholder="22" required>
+                            <input type="number" id="userAge" required>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>Gender</label>
@@ -191,22 +214,27 @@
                     <div style="display: flex; gap: 1rem;">
                         <div class="form-group" style="flex: 1;">
                             <label>Weight (kg)</label>
-                            <input type="number" step="0.1" id="userWeight" placeholder="75.0" required>
+                            <input type="number" step="0.1" id="userWeight" required>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>Height (cm)</label>
-                            <input type="number" step="0.1" id="userHeight" placeholder="180.0" required>
+                            <input type="number" step="0.1" id="userHeight" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Current Goal</label>
                         <select id="userGoal">
-                            <option value="Cut">Cut (Caloric Deficit)</option>
-                            <option value="Maintain">Maintain Weight</option>
-                            <option value="Bulk">Bulk (Caloric Surplus)</option>
+                            <option value="Cut">Cut (-500 kcal)</option>
+                            <option value="Maintain">Maintain</option>
+                            <option value="Bulk">+500 kcal)</option>
                         </select>
                     </div>
-                    <button type="submit">Calculate & Save Profile</button>
+                    <div class="form-group" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                        <label>Manual Calorie Target (Optional Override)</label>
+                        <input type="number" id="manualTarget" placeholder="Leave empty to auto-calculate">
+                    </div>
+                    <button type="submit">Save Changes</button>
+                    <button type="button" id="btnNewUser" style="background: transparent; color: var(--text-muted); border: 1px solid var(--surface); margin-top: 0.5rem;">Create New Profile</button>
                 </form>
             </div>
 
@@ -219,23 +247,23 @@
                     </div>
                     <div class="form-group">
                         <label>Food Item</label>
-                        <input type="text" id="foodItem" placeholder="e.g., Chicken & Rice" required>
+                        <input type="text" id="foodItem" placeholder="e.g., Chicken Rice" required>
                     </div>
                     <div class="form-group">
                         <label>Total Calories</label>
-                        <input type="number" id="mealCals" placeholder="450" required>
+                        <input type="number" id="mealCals" required>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
                         <div class="form-group" style="flex: 1;">
-                            <label>Protein (g)</label>
+                            <label>P (g)</label>
                             <input type="number" id="mealProtein" value="0">
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label>Carbs (g)</label>
+                            <label>C (g)</label>
                             <input type="number" id="mealCarbs" value="0">
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label>Fats (g)</label>
+                            <label>F (g)</label>
                             <input type="number" id="mealFats" value="0">
                         </div>
                     </div>
@@ -262,12 +290,12 @@
                     </div>
                     <div style="display: flex; gap: 1rem;">
                         <div class="form-group" style="flex: 1;">
-                            <label>Duration (mins)</label>
-                            <input type="number" id="workoutDuration" placeholder="60" required>
+                            <label>Mins</label>
+                            <input type="number" id="workoutDuration" required>
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label>Calories Burned</label>
-                            <input type="number" id="workoutCals" placeholder="300" required>
+                            <label>Burned</label>
+                            <input type="number" id="workoutCals" required>
                         </div>
                     </div>
                     <button type="submit">Add Workout</button>
@@ -277,114 +305,132 @@
 
         <div class="col-right">
             <div class="card">
-                <h2>Recent Meals</h2>
+                <h2>Recent Intake</h2>
                 <table>
                     <thead>
                         <tr>
                             <th>Date</th>
                             <th>Item</th>
-                            <th>Calories</th>
-                            <th>Macros (P/C/F)</th>
+                            <th>Kcal</th>
+                            <th>Macros</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="mealTableBody">
-                        <tr><td colspan="5">Loading meals...</td></tr>
-                    </tbody>
+                    <tbody id="mealTableBody"></tbody>
                 </table>
             </div>
 
             <div class="card">
-                <h2>Recent Workouts</h2>
+                <h2>Recent Activity</h2>
                 <table>
                     <thead>
                         <tr>
                             <th>Date</th>
                             <th>Category</th>
-                            <th>Duration</th>
+                            <th>Time</th>
                             <th>Burned</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="workoutTableBody">
-                        <tr><td colspan="5">Loading workouts...</td></tr>
-                    </tbody>
+                    <tbody id="workoutTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        // Set default dates to today
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('mealDate').value = today;
         document.getElementById('workoutDate').value = today;
 
+        let currentUserId = localStorage.getItem('selectedUserId') || '1';
         let userStats = { bmr: 0, target: 0, goal: 'Maintain' };
         let dailyTotals = { consumed: 0, burned: 0 };
 
         function updateNetDeficit() {
             const net = dailyTotals.consumed - dailyTotals.burned;
             const status = net - userStats.target;
-            
             const display = document.getElementById('netDeficitDisplay');
             const label = document.getElementById('netStatusLabel');
             
             display.innerText = `${Math.abs(status)} kcal`;
-            
             if (status <= 0) {
                 display.style.color = 'var(--success)';
-                label.innerText = 'Below Target Limit';
+                label.innerText = 'Remaining Daily Budget';
             } else {
                 display.style.color = 'var(--danger)';
                 label.innerText = 'Over Daily Target';
             }
         }
 
-        // --- 1. PROFILE & BIOMETRICS ---
+        // --- FETCH ALL USERS ---
+        function loadUserList() {
+            fetch('/api/get_users')
+            .then(res => res.json())
+            .then(data => {
+                const selector = document.getElementById('userSelector');
+                selector.innerHTML = '';
+                data.data.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.UserID;
+                    opt.innerText = u.Username;
+                    if (u.UserID == currentUserId) opt.selected = true;
+                    selector.appendChild(opt);
+                });
+            });
+        }
+
+        document.getElementById('userSelector').addEventListener('change', (e) => {
+            currentUserId = e.target.value;
+            localStorage.setItem('selectedUserId', currentUserId);
+            loadDashboardData();
+        });
+
+        document.getElementById('btnNewUser').addEventListener('click', () => {
+            currentUserId = null;
+            document.getElementById('profileForm').reset();
+            document.getElementById('username').focus();
+            alert("Enter details for new profile and click 'Save Changes'");
+        });
+
+        // --- PROFILE SUBMISSION ---
         document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const age = parseInt(document.getElementById('userAge').value);
             const weight = parseFloat(document.getElementById('userWeight').value);
             const height = parseFloat(document.getElementById('userHeight').value);
             const gender = document.getElementById('userGender').value;
             const goal = document.getElementById('userGoal').value;
+            const manualTarget = document.getElementById('manualTarget').value;
 
-            let bmr = (10 * weight) + (6.25 * height) - (5 * age);
-            bmr = gender === 'M' ? bmr + 5 : bmr - 161;
-            bmr = Math.round(bmr);
+            let bmr = Math.round((10 * weight) + (6.25 * height) - (5 * age) + (gender === 'M' ? 5 : -161));
+            let targetCalories = manualTarget ? parseInt(manualTarget) : Math.round(bmr * 1.2 + (goal === 'Cut' ? -500 : goal === 'Bulk' ? 500 : 0));
 
-            let targetCalories = bmr * 1.2;
-            if (goal === 'Cut') targetCalories -= 500;
-            if (goal === 'Bulk') targetCalories += 500;
-            targetCalories = Math.round(targetCalories);
-
-            userStats = { bmr, target: targetCalories, goal };
-            
-            document.getElementById('displayGoal').innerText = goal;
-            document.getElementById('displayBMR').innerText = bmr + " kcal";
-            document.getElementById('displayTarget').innerText = targetCalories + " kcal";
+            const payload = { 
+                user_id: currentUserId,
+                username: document.getElementById('username').value,
+                age, weight, height, gender, goal, bmr, 
+                target_calories: targetCalories 
+            };
 
             fetch('/api/add_user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ age, weight, height, gender, goal, bmr, target_calories: targetCalories })
+                body: JSON.stringify(payload)
             })
             .then(res => res.json())
             .then(data => {
-                if(data.status === "success") {
-                    alert("Profile updated!");
-                    updateNetDeficit();
-                } else alert("Error: " + data.message);
+                alert(data.message);
+                loadUserList();
+                loadDashboardData();
             });
         });
 
-        // --- 2. MEAL SUBMISSION ---
+        // --- DATA LOGGING ---
         document.getElementById('mealForm').addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            const form = e.target;
+            e.preventDefault();
             const payload = {
+                user_id: currentUserId,
                 date: document.getElementById('mealDate').value,
                 food: document.getElementById('foodItem').value,
                 calories: document.getElementById('mealCals').value,
@@ -392,52 +438,34 @@
                 carbs: document.getElementById('mealCarbs').value,
                 fats: document.getElementById('mealFats').value
             };
-
             fetch('/api/add_meal', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === "success") {
-                    form.reset();
-                    document.getElementById('mealDate').value = today;
-                    loadDashboardData();
-                }
-            });
+            }).then(() => { e.target.reset(); document.getElementById('mealDate').value = today; loadDashboardData(); });
         });
 
-        // --- 3. WORKOUT SUBMISSION ---
         document.getElementById('workoutForm').addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            const form = e.target;
+            e.preventDefault();
             const payload = {
+                user_id: currentUserId,
                 date: document.getElementById('workoutDate').value,
                 category: document.getElementById('workoutCategory').value,
                 duration: document.getElementById('workoutDuration').value,
                 calories: document.getElementById('workoutCals').value
             };
-
             fetch('/api/add_workout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === "success") {
-                    form.reset();
-                    document.getElementById('workoutDate').value = today;
-                    loadDashboardData();
-                }
-            });
+            }).then(() => { e.target.reset(); document.getElementById('workoutDate').value = today; loadDashboardData(); });
         });
 
-        // --- 4. LOAD DATA ---
+        // --- DASHBOARD REFRESH ---
         function loadDashboardData() {
-            // Fetch User
-            fetch('/api/get_user')
+            if (!currentUserId) return;
+            
+            fetch(`/api/get_user?user_id=${currentUserId}`)
             .then(res => res.json())
             .then(data => {
                 if(data.status === "success") {
@@ -447,65 +475,44 @@
                     document.getElementById('displayBMR').innerText = u.CalculatedBMR + " kcal";
                     document.getElementById('displayTarget').innerText = u.TargetCalories + " kcal";
                     
-                    // Fill form with current data
+                    document.getElementById('username').value = u.Username;
                     document.getElementById('userAge').value = u.Age;
                     document.getElementById('userWeight').value = u.WeightKG;
                     document.getElementById('userHeight').value = u.HeightCM;
                     document.getElementById('userGender').value = u.Gender;
                     document.getElementById('userGoal').value = u.FitnessGoal;
+                    document.getElementById('manualTarget').value = u.TargetCalories;
                 }
             });
 
-            // Fetch Meals
-            fetch('/api/get_meals')
+            fetch(`/api/get_meals?user_id=${currentUserId}`)
             .then(res => res.json())
             .then(data => {
-                if(data.status === "success") {
-                    const tbody = document.getElementById('mealTableBody');
-                    tbody.innerHTML = '';
-                    dailyTotals.consumed = 0;
-                    data.data.forEach(meal => {
-                        if (meal.LogDate === today) dailyTotals.consumed += meal.Calories;
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${meal.LogDate}</td>
-                                <td>${meal.FoodItem}</td>
-                                <td>${meal.Calories}</td>
-                                <td>${meal.ProteinGrams} / ${meal.CarbsGrams} / ${meal.FatsGrams}</td>
-                                <td><button class="btn-delete">X</button></td>
-                            </tr>
-                        `;
-                    });
-                    updateNetDeficit();
-                }
+                const tbody = document.getElementById('mealTableBody');
+                tbody.innerHTML = '';
+                dailyTotals.consumed = 0;
+                data.data.forEach(m => {
+                    if (m.LogDate === today) dailyTotals.consumed += m.Calories;
+                    tbody.innerHTML += `<tr><td>${m.LogDate}</td><td>${m.FoodItem}</td><td>${m.Calories}</td><td>${m.ProteinGrams}/${m.CarbsGrams}/${m.FatsGrams}</td><td><button class="btn-delete">X</button></td></tr>`;
+                });
+                updateNetDeficit();
             });
 
-            // Fetch Workouts
-            fetch('/api/get_workouts')
+            fetch(`/api/get_workouts?user_id=${currentUserId}`)
             .then(res => res.json())
             .then(data => {
-                if(data.status === "success") {
-                    const tbody = document.getElementById('workoutTableBody');
-                    tbody.innerHTML = '';
-                    dailyTotals.burned = 0;
-                    data.data.forEach(w => {
-                        if (w.LogDate === today) dailyTotals.burned += w.CaloriesBurned;
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${w.LogDate}</td>
-                                <td>${w.WorkoutCategory}</td>
-                                <td>${w.DurationMinutes}m</td>
-                                <td>${w.CaloriesBurned}</td>
-                                <td><button class="btn-delete">X</button></td>
-                            </tr>
-                        `;
-                    });
-                    updateNetDeficit();
-                }
+                const tbody = document.getElementById('workoutTableBody');
+                tbody.innerHTML = '';
+                dailyTotals.burned = 0;
+                data.data.forEach(w => {
+                    if (w.LogDate === today) dailyTotals.burned += w.CaloriesBurned;
+                    tbody.innerHTML += `<tr><td>${w.LogDate}</td><td>${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete">X</button></td></tr>`;
+                });
+                updateNetDeficit();
             });
         }
 
-        window.onload = loadDashboardData;
+        window.onload = () => { loadUserList(); loadDashboardData(); };
     </script>
 </body>
 </html>

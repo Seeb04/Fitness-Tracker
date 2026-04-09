@@ -1,43 +1,22 @@
 # Gemini Context: Fitness-Tracker
 
-This document serves as the foundational context for Gemini CLI's interaction with the **Fitness-Tracker** project. It outlines the project's architecture, goals, and technical constraints.
+## 🎯 Current Status
+The project has successfully transitioned from an MVP to a **Multi-User SaaS Framework**. 
 
-## 🎯 Project Overview
-The **Fitness-Tracker** is a cloud-native macro and exercise tracking application developed for a DBMS Laboratory course. It focuses on providing a minimalist, high-performance interface for logging nutritional intake and physical activity to calculate net daily energy deficits.
+## 🛠️ Updated Tech Stack & Architecture
+- **Frontend:** SPA with vanilla JS, featuring dynamic profile switching and real-time dashboard updates.
+- **Backend:** Python serverless functions on Vercel, now fully parameterized to support dynamic `user_id` context.
+- **Database:** Aiven MySQL with a normalized schema supporting `Users`, `Meals`, and `Workouts`.
 
-## 🛠️ Tech Stack
-- **Frontend:** Single-page application (SPA) using vanilla HTML5, CSS3 (Modern dark/blue theme), and JavaScript (ES6+).
-- **Backend:** Python 3.x serverless functions deployed via **Vercel Functions**.
-- **Database:** **Aiven MySQL** (Cloud-hosted instance).
-- **Deployment:** Vercel (Frontend & API orchestration).
+## 🏗️ Core Multi-User Logic
+- **Profile Switching:** The UI maintains a `currentUserId` in `localStorage` and a dropdown selector in the header.
+- **Dynamic Fetching:** All GET/POST requests (`/api/get_meals`, `/api/add_workout`, etc.) include a `user_id` query param or payload field.
+- **Biometric Engine:** Mifflin-St Jeor calculation with support for a **Manual Calorie Target Override**.
 
-## 🏗️ Core Architecture
-- **API Layer (`/api`):** Modular Python scripts acting as serverless endpoints.
-  - `add_meal.py`: Handles POST requests to log food items and calories.
-  - `add_workout.py`: Handles POST requests to log activity types and calories burned.
-- **Data Model:**
-  - `Meals`: (LogDate, FoodItem, CaloriesIn)
-  - `Workouts`: (LogDate, WorkoutType, CaloriesBurned)
-  - *Planned:* `Users` (Biometrics), `Routines`, `Recipes`.
-
-## 📈 Project Scope & Roadmap
-
-### Phase 1: MVP (The Grade Saver) - **Current Focus**
-- [ ] Complete `add_user.py` for biometric management.
-- [ ] Enhance existing logging to include full macros (Protein, Carbs, Fats).
-- [ ] Implement BMR Calculation (Mifflin-St Jeor) in the frontend.
-- [ ] Establish a visual "Net Daily Deficit" KPI.
-
-### Phase 2: SaaS Evolution (Backlog)
-- [ ] **Routine Builder:** Custom workout plans (e.g., PPL, Upper/Lower).
-- [ ] **Recipe Engine:** Component-based recipe macro calculations.
-- [ ] **Progressive Overload Tracking:** Logging weights/reps per set.
-
-## 🛡️ Development Mandates
-1. **Security:** Never hardcode database credentials. Always use `os.environ.get()` to access Vercel environment variables.
-2. **Database Integrity:** Use parameterized queries (`%s`) to prevent SQL injection.
-3. **UI Consistency:** Adhere to the defined CSS variables (`--primary`, `--surface`, etc.) for all new components.
-4. **Efficiency:** Prefer surgical updates to the single-page `index.html` to maintain its "clean" architecture.
+## 🛡️ Active Mandates
+1. **Parameterization:** All SQL queries *must* include `WHERE UserID = %s` or use the payload `user_id` to prevent data leaking between profiles.
+2. **Schema Integrity:** Adhere to the `dbschema.txt` definitions.
+3. **UI Consistency:** All new features must use the established dark/blue theme variables.
 
 ---
-*Note: This project is part of a University DBMS Lab. Prioritize database schema normalization and query efficiency in all recommendations.*
+*Last Updated: April 9, 2026 | Focus: Phase 2 SaaS Enhancements*
