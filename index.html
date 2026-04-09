@@ -120,6 +120,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
+            margin-top: 0.5rem;
         }
 
         button:hover {
@@ -164,7 +165,7 @@
         <div class="header">
             <h1>Fitness & Macro Tracker</h1>
             <div class="header-stats">
-                Target: Cut | User: Admin | BMR: <strong style="color: #fff;">1850 kcal</strong>
+                Goal: <span id="displayGoal">Cut</span> | Target: <strong id="displayTarget" style="color: var(--primary);">1630 kcal</strong> | BMR: <strong id="displayBMR" style="color: #fff;">1775 kcal</strong>
             </div>
         </div>
 
@@ -172,7 +173,45 @@
             <div class="card kpi">
                 <h2>Today's Net Deficit</h2>
                 <div class="kpi-value">-350 kcal</div>
-                <small style="color: var(--text-muted);">Goal: -500 kcal</small>
+                <small style="color: var(--text-muted);">Goal: Hit Target Calorie Deficit</small>
+            </div>
+
+            <div class="card">
+                <h2>Update Profile & Biometrics</h2>
+                <form id="profileForm">
+                    <div style="display: flex; gap: 1rem;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Age</label>
+                            <input type="number" id="userAge" placeholder="e.g., 22" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Gender</label>
+                            <select id="userGender">
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Weight (kg)</label>
+                            <input type="number" step="0.1" id="userWeight" placeholder="75.0" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Height (cm)</label>
+                            <input type="number" step="0.1" id="userHeight" placeholder="180.0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Current Goal</label>
+                        <select id="userGoal">
+                            <option value="Cut">Cut (Caloric Deficit)</option>
+                            <option value="Maintain">Maintain Weight</option>
+                            <option value="Bulk">Bulk (Caloric Surplus)</option>
+                        </select>
+                    </div>
+                    <button type="submit">Calculate & Save Profile</button>
+                </form>
             </div>
 
             <div class="card">
@@ -187,8 +226,22 @@
                         <input type="text" id="foodItem" placeholder="e.g., Grilled Chicken Rice" required>
                     </div>
                     <div class="form-group">
-                        <label>Calories</label>
+                        <label>Total Calories</label>
                         <input type="number" id="mealCals" placeholder="450" required>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Protein (g)</label>
+                            <input type="number" id="mealProtein" placeholder="0">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Carbs (g)</label>
+                            <input type="number" id="mealCarbs" placeholder="0">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Fats (g)</label>
+                            <input type="number" id="mealFats" placeholder="0">
+                        </div>
                     </div>
                     <button type="submit">Add Meal</button>
                 </form>
@@ -202,16 +255,24 @@
                         <input type="date" id="workoutDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Type</label>
-                        <select id="workoutType">
-                            <option>PPL (Push/Pull/Legs)</option>
+                        <label>Category</label>
+                        <select id="workoutCategory">
+                            <option>PPL - Push</option>
+                            <option>PPL - Pull</option>
+                            <option>PPL - Legs</option>
                             <option>HIIT</option>
-                            <option>Cardio (LISS)</option>
+                            <option>LISS Cardio</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Calories Burned</label>
-                        <input type="number" id="workoutCals" placeholder="300" required>
+                    <div style="display: flex; gap: 1rem;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Duration (mins)</label>
+                            <input type="number" id="workoutDuration" placeholder="60" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Calories Burned</label>
+                            <input type="number" id="workoutCals" placeholder="300" required>
+                        </div>
                     </div>
                     <button type="submit">Add Workout</button>
                 </form>
@@ -227,14 +288,16 @@
                             <th>Date</th>
                             <th>Item</th>
                             <th>Calories</th>
+                            <th>Macros (P/C/F)</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="mealTableBody">
                         <tr>
-                            <td>2026-04-06</td>
-                            <td>Oatmeal & Protein</td>
-                            <td>420</td>
+                            <td>2026-04-09</td>
+                            <td>Chicken Tikka & Naan</td>
+                            <td>650</td>
+                            <td>45 / 60 / 20</td>
                             <td><button class="btn-delete">X</button></td>
                         </tr>
                     </tbody>
@@ -247,16 +310,18 @@
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Duration</th>
                             <th>Burned</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="workoutTableBody">
                         <tr>
-                            <td>2026-04-06</td>
-                            <td>PPL (Push/Pull/Legs)</td>
-                            <td>380</td>
+                            <td>2026-04-09</td>
+                            <td>PPL - Push Day</td>
+                            <td>60m</td>
+                            <td>320</td>
                             <td><button class="btn-delete">X</button></td>
                         </tr>
                     </tbody>
@@ -266,20 +331,59 @@
     </div>
 
     <script>
-        // Example of how you will intercept the form and send data to your database
+        // --- 1. PROFILE & BIOMETRICS SUBMISSION ---
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const age = parseInt(document.getElementById('userAge').value);
+            const weight = parseFloat(document.getElementById('userWeight').value);
+            const height = parseFloat(document.getElementById('userHeight').value);
+            const gender = document.getElementById('userGender').value;
+            const goal = document.getElementById('userGoal').value;
+
+            // Mifflin-St Jeor BMR Calculation
+            let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+            bmr = gender === 'M' ? bmr + 5 : bmr - 161;
+            bmr = Math.round(bmr);
+
+            // Calculate Target Calories (Assuming light activity multiplier of 1.2)
+            let targetCalories = bmr * 1.2;
+            if (goal === 'Cut') targetCalories -= 500;
+            if (goal === 'Bulk') targetCalories += 500;
+            targetCalories = Math.round(targetCalories);
+
+            // Update UI instantly
+            document.getElementById('displayGoal').innerText = goal;
+            document.getElementById('displayBMR').innerText = bmr + " kcal";
+            document.getElementById('displayTarget').innerText = targetCalories + " kcal";
+
+            const payload = { age, weight, height, gender, goal, bmr, target_calories: targetCalories };
+
+            fetch('/api/add_user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "success") alert("Profile updated! BMR and Targets saved to database.");
+                else alert("Database error: " + data.message);
+            }).catch(error => console.error('Error:', error));
+        });
+
+        // --- 2. MEAL SUBMISSION ---
         document.getElementById('mealForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // Stop page refresh
+            e.preventDefault(); 
             
             const payload = {
                 date: document.getElementById('mealDate').value,
                 food: document.getElementById('foodItem').value,
-                calories: document.getElementById('mealCals').value
+                calories: document.getElementById('mealCals').value,
+                protein: document.getElementById('mealProtein').value || 0,
+                carbs: document.getElementById('mealCarbs').value || 0,
+                fats: document.getElementById('mealFats').value || 0
             };
 
-            console.log("Sending to Database:", payload);
-            alert("Meal ready to be inserted! Check console.");
-            
-            // Send the data to your new Python API
             fetch('/api/add_meal', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -288,29 +392,23 @@
             .then(response => response.json())
             .then(data => {
                 if(data.status === "success") {
-                    alert("Awesome! Meal saved to the database.");
-                } else {
-                    alert("Uh oh, database error: " + data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-                        this.reset();
-                    });
+                    alert("Awesome! Meal and macros saved to the database.");
+                    this.reset();
+                } else alert("Database error: " + data.message);
+            }).catch(error => console.error('Error:', error));
+        });
 
-            // Listen for the Workout Form submission
+        // --- 3. WORKOUT SUBMISSION ---
         document.getElementById('workoutForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // Stop page refresh
+            e.preventDefault(); 
             
-            // Gather the data from the workout input fields
             const payload = {
                 date: document.getElementById('workoutDate').value,
-                type: document.getElementById('workoutType').value,
+                category: document.getElementById('workoutCategory').value,
+                duration: document.getElementById('workoutDuration').value,
                 calories: document.getElementById('workoutCals').value
             };
 
-            console.log("Sending Workout to Database:", payload);
-
-            // Call your new Python script on Vercel
             fetch('/api/add_workout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -320,14 +418,9 @@
             .then(data => {
                 if(data.status === "success") {
                     alert("Boom! Workout saved to the database.");
-                } else {
-                    alert("Uh oh, database error: " + data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-
-            // Clear the form after clicking submit
-            this.reset();
+                    this.reset();
+                } else alert("Database error: " + data.message);
+            }).catch(error => console.error('Error:', error));
         });
     </script>
 </body>
