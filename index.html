@@ -469,7 +469,12 @@
         document.getElementById('workoutDate').value = today;
         document.getElementById('weightDate').value = today;
 
-        let currentUserId = localStorage.getItem('selectedUserId') || null;
+        // Grab the ID, but if it's the string "null" or "undefined", force it to be an actual null value
+        let currentUserId = localStorage.getItem('selectedUserId');
+        if (currentUserId === "null" || currentUserId === "undefined") {
+            currentUserId = null;
+        }
+
         let userStats = { bmr: 0, target: 0, goal: 'Maintain', current: {} };
         let dailyTotals = { consumed: 0, burned: 0 };
 
