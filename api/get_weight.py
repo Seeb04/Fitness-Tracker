@@ -23,6 +23,10 @@ class handler(BaseHTTPRequestHandler):
             cursor.execute(query, (user_id,))
             weights = cursor.fetchall()
 
+            for w in weights:
+                if w.get('WeightKG') is not None:
+                    w['WeightKG'] = float(w['WeightKG'])
+
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()

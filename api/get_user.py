@@ -24,6 +24,10 @@ class handler(BaseHTTPRequestHandler):
             user = cursor.fetchone()
 
             if user:
+                if user.get('WeightKG') is not None:
+                    user['WeightKG'] = float(user['WeightKG'])
+                if user.get('HeightCM') is not None:
+                    user['HeightCM'] = float(user['HeightCM'])
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
