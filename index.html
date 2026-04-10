@@ -3,82 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness & Macro Tracker</title>
+    <title>TrackFit AI | Premium</title>
     <style>
         :root {
-            --bg-dark: #0B1120;
-            --surface: #1E293B;
-            --primary: #0EA5E9;
-            --primary-hover: #38BDF8;
-            --text-light: #F8FAFC;
-            --text-muted: #94A3B8;
-            --danger: #EF4444;
-            --success: #10B981;
-            --border-radius: 12px;
+            /* Premium SaaS Color Palette (Zinc & Teal) */
+            --bg-dark: #09090b; 
+            --surface: #18181b; 
+            --surface-hover: #27272a;
+            --primary: #14b8a6; 
+            --primary-hover: #0d9488;
+            --text-light: #fafafa;
+            --text-muted: #a1a1aa;
+            --danger: #f43f5e;
+            --success: #10b981;
+            --border-radius: 16px;
+            --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-light);
             margin: 0;
             display: flex;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Sidebar Navigation */
+        /* --- Animations --- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* --- Sidebar Navigation --- */
         .sidebar {
-            width: 240px;
-            background-color: var(--surface);
-            border-right: 1px solid rgba(255,255,255,0.05);
+            width: 260px;
+            background-color: var(--bg-dark);
+            border-right: var(--border-subtle);
             display: flex;
             flex-direction: column;
-            padding: 2rem 1rem;
+            padding: 2.5rem 1.5rem;
             position: fixed;
             height: 100vh;
+            z-index: 10;
         }
 
         .sidebar h1 {
-            font-size: 1.2rem;
-            color: var(--primary);
-            margin-bottom: 2rem;
-            padding: 0 1rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-light);
+            margin-bottom: 2.5rem;
+            padding: 0 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar h1::before {
+            content: '';
+            display: block;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(20, 184, 166, 0.5);
         }
 
         .nav-link {
             color: var(--text-muted);
             text-decoration: none;
             padding: 0.8rem 1rem;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-bottom: 0.5rem;
             cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
+            transition: var(--transition-smooth);
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(14, 165, 233, 0.1);
+        .nav-link:hover {
+            color: var(--text-light);
+            background-color: rgba(255, 255, 255, 0.03);
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background-color: var(--surface);
             color: var(--primary);
+            border: var(--border-subtle);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        /* Main Content */
+        /* --- Main Content --- */
         .main-content {
-            margin-left: 240px;
+            margin-left: 260px;
             flex: 1;
-            padding: 2rem;
-            max-width: 1200px;
+            padding: 3rem;
+            max-width: 1400px;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
+            background: transparent;
+            padding: 0;
+        }
+
+        .stats-strip {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
             background: var(--surface);
             padding: 1rem 1.5rem;
             border-radius: var(--border-radius);
+            border: var(--border-subtle);
+        }
+        
+        .stats-strip strong { 
+            color: var(--text-light); 
+            font-weight: 600;
+            margin-left: 0.3rem;
+        }
+
+        .user-controls select {
+            background: var(--surface);
+            border: var(--border-subtle);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        
+        .user-controls select:hover {
+            border-color: rgba(255,255,255,0.2);
         }
 
         .view-section {
@@ -95,26 +174,34 @@
             gap: 1.5rem;
         }
 
+        /* --- Premium Cards --- */
         .card {
             background-color: var(--surface);
-            padding: 1.5rem;
+            padding: 2rem;
             border-radius: var(--border-radius);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            border: var(--border-subtle);
             margin-bottom: 1.5rem;
+            transition: var(--transition-smooth);
+        }
+
+        .card:hover {
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            transform: translateY(-2px);
         }
 
         .card h2 {
             margin-top: 0;
             font-size: 1.1rem;
+            font-weight: 600;
             color: var(--text-light);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 0.8rem;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
+        /* --- KPIs (Gradient Text) --- */
         .kpi-container {
             display: flex;
             gap: 1.5rem;
@@ -123,18 +210,23 @@
 
         .kpi-card {
             flex: 1;
-            text-align: center;
+            text-align: left; /* Shifted to left for a cleaner look */
         }
 
         .kpi-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary);
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
             margin: 0.5rem 0;
+            /* Premium Gradient Effect */
+            background: linear-gradient(135deg, #2dd4bf, #0d9488);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
+        /* --- Forms & Inputs --- */
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
             display: flex;
             flex-direction: column;
         }
@@ -142,95 +234,124 @@
         label {
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.4rem;
+            font-weight: 500;
         }
 
         input, select {
             background-color: var(--bg-dark);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: var(--border-subtle);
             color: var(--text-light);
-            padding: 0.7rem;
-            border-radius: 6px;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
             font-size: 0.95rem;
+            transition: var(--transition-smooth);
         }
 
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
+        }
+
+        /* --- Buttons --- */
         button {
-            background-color: var(--primary);
-            color: #000;
+            background-color: var(--text-light);
+            color: var(--bg-dark);
             border: none;
             padding: 0.8rem;
             width: 100%;
-            border-radius: 6px;
-            font-weight: bold;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: var(--transition-smooth);
             margin-top: 0.5rem;
         }
 
         button:hover {
+            background-color: #e4e4e7;
+            transform: scale(0.98); /* Tactile press effect */
+        }
+
+        button[type="submit"] {
+            background-color: var(--primary);
+            color: #fff;
+        }
+
+        button[type="submit"]:hover {
             background-color: var(--primary-hover);
         }
 
+        /* --- Tables --- */
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
         th, td {
-            padding: 0.8rem;
+            padding: 1rem 0.5rem;
             text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: var(--border-subtle);
+            font-size: 0.9rem;
         }
 
         th {
             color: var(--text-muted);
-            font-weight: normal;
-            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
         }
 
         .btn-delete {
             background-color: transparent;
-            color: var(--danger);
-            border: 1px solid var(--danger);
-            padding: 0.2rem 0.5rem;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            padding: 0.3rem 0.6rem;
             width: auto;
-            margin-top: 0;
+            border-radius: 6px;
+        }
+
+        .btn-delete:hover {
+            background-color: rgba(244, 63, 94, 0.1);
+            color: var(--danger);
+            border-color: rgba(244, 63, 94, 0.2);
+            transform: none;
         }
 
         .filter-btns {
             display: flex;
             gap: 0.5rem;
+            background: var(--bg-dark);
+            padding: 0.3rem;
+            border-radius: 8px;
+            border: var(--border-subtle);
         }
 
         .btn-mini {
-            padding: 0.3rem 0.6rem;
-            font-size: 0.7rem;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
             width: auto;
-            background: rgba(255,255,255,0.05);
+            background: transparent;
             color: var(--text-muted);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: none;
             margin-top: 0;
+            border-radius: 6px;
         }
 
         .btn-mini.active {
-            background: var(--primary);
-            color: #000;
-            border-color: var(--primary);
+            background: var(--surface-hover);
+            color: var(--text-light);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-
-        .stats-strip {
-            display: flex;
-            gap: 1.5rem;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-        .stats-strip strong { color: #fff; }
     </style>
 </head>
 <body>
 
     <nav class="sidebar">
-        <h1>TrackFit AI</h1>
+        <h1>TrackFit</h1>
         <div class="nav-link active" onclick="switchView('overview', this)">Overview</div>
         <div class="nav-link" onclick="switchView('meals', this)">Nutrition</div>
         <div class="nav-link" onclick="switchView('workouts', this)">Training</div>
@@ -238,53 +359,49 @@
     </nav>
 
     <main class="main-content">
-        <div class="header">
+        <div class="header animate-in" style="animation-delay: 0.1s;">
             <div class="stats-strip">
                 <span>Goal: <strong id="displayGoal">---</strong></span>
                 <span>BMR: <strong id="displayBMR">---</strong></span>
                 <span>Target: <strong id="displayTarget" style="color: var(--primary);">---</strong></span>
             </div>
             <div class="user-controls">
-                <label style="margin-bottom: 0;">Profile:</label>
-                <select id="userSelector" style="padding: 0.4rem;"></select>
+                <select id="userSelector"></select>
             </div>
         </div>
 
-        <!-- OVERVIEW SECTION -->
         <section id="overview" class="view-section active">
             <div class="kpi-container">
-                <div class="card kpi-card">
-                    <h2>Daily Progress</h2>
+                <div class="card kpi-card animate-in" style="animation-delay: 0.2s;">
+                    <h2 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Daily Balance</h2>
                     <div id="netDeficitDisplay" class="kpi-value">0 kcal</div>
-                    <small id="netStatusLabel" style="color: var(--text-muted);">Budget Remaining</small>
+                    <small id="netStatusLabel" style="color: var(--text-muted); font-weight: 500;">Budget Remaining</small>
                 </div>
-                <div class="card kpi-card">
-                    <h2>Body Metrics</h2>
-                    <div id="bmiDisplay" class="kpi-value">---</div>
-                    <small style="color: var(--text-muted);">Current BMI</small>
+                <div class="card kpi-card animate-in" style="animation-delay: 0.3s;">
+                    <h2 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Body Metrics</h2>
+                    <div id="bmiDisplay" class="kpi-value" style="background: var(--text-light); -webkit-background-clip: text;">---</div>
+                    <small style="color: var(--text-muted); font-weight: 500;">Current BMI</small>
                 </div>
             </div>
 
-            <div class="dashboard-grid">
+            <div class="dashboard-grid animate-in" style="animation-delay: 0.4s;">
                 <div class="card">
                     <h2>Today's Mission</h2>
-                    <div id="routineWidget" style="color: var(--text-muted);">
-                        <p>Loading active routine...</p>
-                        <button style="background: rgba(255,255,255,0.05); color: var(--primary); border: 1px solid var(--primary);">Start Logged Session</button>
+                    <div id="routineWidget" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+                        <p>No active routine detected. Head to the Training tab to log a session or build a new protocol.</p>
                     </div>
                 </div>
                 <div class="card">
                     <h2>Weight Trend</h2>
-                    <div id="weightHistoryList" style="font-size: 0.85rem; color: var(--text-muted);"></div>
+                    <div id="weightHistoryList" style="font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.8rem;"></div>
                 </div>
             </div>
         </section>
 
-        <!-- MEALS SECTION -->
         <section id="meals" class="view-section">
             <div class="dashboard-grid">
-                <div class="card">
-                    <h2>Log a Meal</h2>
+                <div class="card animate-in">
+                    <h2>Log Nutrition</h2>
                     <form id="mealForm">
                         <div class="form-group">
                             <label>Date</label>
@@ -292,35 +409,35 @@
                         </div>
                         <div class="form-group">
                             <label>Food Item</label>
-                            <input type="text" id="foodItem" placeholder="e.g., Chicken Rice" required>
+                            <input type="text" id="foodItem" placeholder="e.g., Grilled Salmon & Quinoa" required>
                         </div>
                         <div class="form-group">
                             <label>Total Calories</label>
                             <input type="number" id="mealCals" required>
                         </div>
-                        <div style="display: flex; gap: 0.5rem;">
+                        <div style="display: flex; gap: 0.8rem;">
                             <div class="form-group" style="flex: 1;">
-                                <label>P (g)</label>
+                                <label>Pro (g)</label>
                                 <input type="number" id="mealProtein" value="0">
                             </div>
                             <div class="form-group" style="flex: 1;">
-                                <label>C (g)</label>
+                                <label>Carb (g)</label>
                                 <input type="number" id="mealCarbs" value="0">
                             </div>
                             <div class="form-group" style="flex: 1;">
-                                <label>F (g)</label>
+                                <label>Fat (g)</label>
                                 <input type="number" id="mealFats" value="0">
                             </div>
                         </div>
-                        <button type="submit">Add Meal</button>
+                        <button type="submit">Log Meal</button>
                     </form>
                 </div>
-                <div class="card">
+                <div class="card animate-in" style="animation-delay: 0.1s;">
                     <h2>
                         Recent Intake
                         <div class="filter-btns">
                             <button class="btn-mini active" onclick="loadMeals(null, this)">Latest</button>
-                            <button class="btn-mini" onclick="loadMeals(7, this)">7d</button>
+                            <button class="btn-mini" onclick="loadMeals(7, this)">7 Days</button>
                         </div>
                     </h2>
                     <table id="mealTable">
@@ -329,7 +446,7 @@
                                 <th>Date</th>
                                 <th>Item</th>
                                 <th>Kcal</th>
-                                <th>Macros</th>
+                                <th>Macros (P/C/F)</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -339,10 +456,9 @@
             </div>
         </section>
 
-        <!-- WORKOUTS SECTION -->
         <section id="workouts" class="view-section">
             <div class="dashboard-grid">
-                <div class="card">
+                <div class="card animate-in">
                     <h2>Log Activity</h2>
                     <form id="workoutForm">
                         <div class="form-group">
@@ -355,36 +471,36 @@
                                 <option>PPL - Push</option>
                                 <option>PPL - Pull</option>
                                 <option>PPL - Legs</option>
-                                <option>HIIT</option>
+                                <option>HIIT Protocol</option>
                                 <option>LISS Cardio</option>
                             </select>
                         </div>
                         <div style="display: flex; gap: 1rem;">
                             <div class="form-group" style="flex: 1;">
-                                <label>Mins</label>
+                                <label>Duration (min)</label>
                                 <input type="number" id="workoutDuration" required>
                             </div>
                             <div class="form-group" style="flex: 1;">
-                                <label>Burned</label>
+                                <label>Energy Burned</label>
                                 <input type="number" id="workoutCals" required>
                             </div>
                         </div>
-                        <button type="submit">Add Workout</button>
+                        <button type="submit">Log Session</button>
                     </form>
                 </div>
-                <div class="card">
+                <div class="card animate-in" style="animation-delay: 0.1s;">
                     <h2>
                         Activity History
                         <div class="filter-btns">
                             <button class="btn-mini active" onclick="loadWorkouts(null, this)">Latest</button>
-                            <button class="btn-mini" onclick="loadWorkouts(7, this)">7d</button>
+                            <button class="btn-mini" onclick="loadWorkouts(7, this)">7 Days</button>
                         </div>
                     </h2>
                     <table id="workoutTable">
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Type</th>
+                                <th>Protocol</th>
                                 <th>Time</th>
                                 <th>Kcal</th>
                                 <th></th>
@@ -396,11 +512,10 @@
             </div>
         </section>
 
-        <!-- PROFILE SECTION -->
         <section id="profile" class="view-section">
             <div class="dashboard-grid">
-                <div class="card">
-                    <h2>Biometric Profile</h2>
+                <div class="card animate-in">
+                    <h2>Biometric Data</h2>
                     <form id="profileForm">
                         <div class="form-group">
                             <label>Display Name</label>
@@ -430,33 +545,33 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Current Goal</label>
+                            <label>Protocol Goal</label>
                             <select id="userGoal">
                                 <option value="Cut">Cut (-500 kcal)</option>
-                                <option value="Maintain">Maintain</option>
+                                <option value="Maintain">Maintenance</option>
                                 <option value="Bulk">Bulk (+500 kcal)</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Manual Calorie Target</label>
-                            <input type="number" id="manualTarget" placeholder="Auto-calculated if empty">
+                            <input type="number" id="manualTarget" placeholder="Leave empty for auto-calculation">
                         </div>
-                        <button type="submit">Save Changes</button>
-                        <button type="button" id="btnNewUser" style="background: transparent; color: var(--text-muted); border: 1px solid var(--surface); margin-top: 0.5rem;">Create New Profile</button>
+                        <button type="submit">Sync Profile</button>
+                        <button type="button" id="btnNewUser" style="background: transparent; color: var(--text-muted); border: var(--border-subtle); margin-top: 0.8rem;">Initialize New Profile</button>
                     </form>
                 </div>
-                <div class="card">
-                    <h2>Weight Entry</h2>
+                <div class="card animate-in" style="animation-delay: 0.1s;">
+                    <h2>Weight Check-in</h2>
                     <form id="weightForm">
                         <div class="form-group">
                             <label>Date</label>
                             <input type="date" id="weightDate" required>
                         </div>
                         <div class="form-group">
-                            <label>Current Weight (kg)</label>
+                            <label>Current Mass (kg)</label>
                             <input type="number" step="0.1" id="logWeightVal" placeholder="--" required>
                         </div>
-                        <button type="submit">Update Weight</button>
+                        <button type="submit">Log Weight</button>
                     </form>
                 </div>
             </div>
@@ -469,20 +584,32 @@
         document.getElementById('workoutDate').value = today;
         document.getElementById('weightDate').value = today;
 
-        // Grab the ID, but if it's the string "null" or "undefined", force it to be an actual null value
         let currentUserId = localStorage.getItem('selectedUserId');
-        if (currentUserId === "null" || currentUserId === "undefined") {
+        if (currentUserId === "null" || currentUserId === "undefined" || currentUserId === "") {
             currentUserId = null;
         }
 
         let userStats = { bmr: 0, target: 0, goal: 'Maintain', current: {} };
         let dailyTotals = { consumed: 0, burned: 0 };
 
+        // UPGRADED: Triggers animations smoothly when switching tabs
         function switchView(viewId, el) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(s => {
+                s.classList.remove('active');
+            });
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             
-            document.getElementById(viewId).classList.add('active');
+            const activeView = document.getElementById(viewId);
+            activeView.classList.add('active');
+            
+            // Re-trigger the fadeInUp animation
+            const cards = activeView.querySelectorAll('.animate-in');
+            cards.forEach(card => {
+                card.style.animation = 'none';
+                card.offsetHeight; /* Trigger reflow */
+                card.style.animation = null; 
+            });
+
             el.classList.add('active');
         }
 
@@ -494,10 +621,13 @@
             
             display.innerText = `${Math.abs(status)} kcal`;
             if (status <= 0) {
-                display.style.color = 'var(--success)';
+                // Changing text color manually overrides the gradient for status colors
+                display.style.background = 'none';
+                display.style.webkitTextFillColor = 'var(--success)';
                 label.innerText = 'Budget Remaining';
             } else {
-                display.style.color = 'var(--danger)';
+                display.style.background = 'none';
+                display.style.webkitTextFillColor = 'var(--danger)';
                 label.innerText = 'Over Daily Target';
             }
         }
@@ -511,13 +641,10 @@
             }).then(() => loadDashboardData());
         }
 
-        // --- FETCH ALL USERS ---
         function loadUserList() {
-            console.log("Fetching users...");
             fetch('/api/get_users')
             .then(res => res.json())
             .then(data => {
-                console.log("Users received:", data);
                 if(data.status !== "success") return;
                 const selector = document.getElementById('userSelector');
                 selector.innerHTML = '';
@@ -547,6 +674,7 @@
 
         document.getElementById('btnNewUser').addEventListener('click', () => {
             currentUserId = null;
+            localStorage.removeItem('selectedUserId'); 
             document.getElementById('profileForm').reset();
             ['username', 'userAge', 'userWeight', 'userHeight', 'logWeightVal'].forEach(id => {
                 document.getElementById(id).placeholder = '--';
@@ -555,7 +683,6 @@
             switchView('profile', document.querySelector('.nav-link:nth-child(4)'));
         });
 
-        // --- WEIGHT LOGGING ---
         document.getElementById('weightForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const val = document.getElementById('logWeightVal').value || document.getElementById('logWeightVal').placeholder;
@@ -564,16 +691,24 @@
             const payload = {
                 user_id: currentUserId,
                 date: document.getElementById('weightDate').value,
-                weight: val
+                weight: parseFloat(val) 
             };
             fetch('/api/add_weight', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            }).then(() => { e.target.reset(); document.getElementById('weightDate').value = today; loadDashboardData(); });
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") alert("Weight logged successfully!");
+                e.target.reset(); 
+                document.getElementById('weightDate').value = today; 
+                loadDashboardData(); 
+            });
         });
 
         function loadWeightHistory() {
+            if (!currentUserId) return;
             fetch(`/api/get_weight?user_id=${currentUserId}`)
             .then(res => res.json())
             .then(data => {
@@ -581,16 +716,14 @@
                 list.innerHTML = '';
                 if(data.status === "success") {
                     data.data.forEach(w => {
-                        list.innerHTML += `<div>${w.LogDate}: <strong>${w.WeightKG} kg</strong></div>`;
+                        list.innerHTML += `<div style="display: flex; justify-content: space-between; border-bottom: var(--border-subtle); padding-bottom: 0.5rem;"><span>${w.LogDate}</span> <strong style="color: var(--text-light);">${w.WeightKG} kg</strong></div>`;
                     });
                 }
             });
         }
 
-        // --- PROFILE SUBMISSION ---
         document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const getVal = (id) => document.getElementById(id).value || document.getElementById(id).placeholder;
             
             const username = getVal('username');
@@ -609,9 +742,7 @@
             let targetCalories = manualTarget ? parseInt(manualTarget) : Math.round(bmr * 1.2 + (goal === 'Cut' ? -500 : goal === 'Bulk' ? 500 : 0));
 
             const payload = { 
-                user_id: currentUserId,
-                username, age, weight, height, gender, goal, bmr, 
-                target_calories: targetCalories 
+                user_id: currentUserId, username, age, weight, height, gender, goal, bmr, target_calories: targetCalories 
             };
 
             fetch('/api/add_user', {
@@ -620,30 +751,41 @@
                 body: JSON.stringify(payload)
             }).then(res => res.json()).then(data => { 
                 if(data.status === "success") {
+                    alert("Profile Saved!");
                     loadUserList(); 
-                    alert("Profile Updated!");
-                    e.target.reset();
+                } else {
+                    alert("Database Error: " + data.message);
                 }
             });
         });
 
-        // --- DATA LOGGING ---
         document.getElementById('mealForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const payload = {
                 user_id: currentUserId,
                 date: document.getElementById('mealDate').value,
                 food: document.getElementById('foodItem').value,
-                calories: document.getElementById('mealCals').value,
-                protein: document.getElementById('mealProtein').value,
-                carbs: document.getElementById('mealCarbs').value,
-                fats: document.getElementById('mealFats').value
+                calories: parseInt(document.getElementById('mealCals').value || 0),
+                protein: parseInt(document.getElementById('mealProtein').value || 0),
+                carbs: parseInt(document.getElementById('mealCarbs').value || 0),
+                fats: parseInt(document.getElementById('mealFats').value || 0)
             };
+            
             fetch('/api/add_meal', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            }).then(() => { e.target.reset(); document.getElementById('mealDate').value = today; loadDashboardData(); });
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    e.target.reset(); 
+                    document.getElementById('mealDate').value = today; 
+                    loadDashboardData();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            });
         });
 
         document.getElementById('workoutForm').addEventListener('submit', function(e) {
@@ -652,18 +794,29 @@
                 user_id: currentUserId,
                 date: document.getElementById('workoutDate').value,
                 category: document.getElementById('workoutCategory').value,
-                duration: document.getElementById('workoutDuration').value,
-                calories: document.getElementById('workoutCals').value
+                duration: parseInt(document.getElementById('workoutDuration').value || 0),
+                calories: parseInt(document.getElementById('workoutCals').value || 0)
             };
+            
             fetch('/api/add_workout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            }).then(() => { e.target.reset(); document.getElementById('workoutDate').value = today; loadDashboardData(); });
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    e.target.reset(); 
+                    document.getElementById('workoutDate').value = today; 
+                    loadDashboardData();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            });
         });
 
-        // --- DATA FETCHING ---
         function loadMeals(days = null, btn = null) {
+            if (!currentUserId) return;
             if (btn) {
                 btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
@@ -676,7 +829,7 @@
                 if(data.status === "success" && data.data) {
                     data.data.forEach(m => {
                         if (!days && m.LogDate === today) dailyTotals.consumed += m.Calories;
-                        tbody.innerHTML += `<tr><td>${m.LogDate}</td><td>${m.FoodItem}</td><td>${m.Calories}</td><td>${m.ProteinGrams}/${m.CarbsGrams}/${m.FatsGrams}</td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">X</button></td></tr>`;
+                        tbody.innerHTML += `<tr><td>${m.LogDate}</td><td style="font-weight: 500;">${m.FoodItem}</td><td>${m.Calories}</td><td><span style="color: var(--text-muted);">${m.ProteinGrams}p / ${m.CarbsGrams}c / ${m.FatsGrams}f</span></td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">Delete</button></td></tr>`;
                     });
                 }
                 updateNetDeficit();
@@ -684,6 +837,7 @@
         }
 
         function loadWorkouts(days = null, btn = null) {
+            if (!currentUserId) return;
             if (btn) {
                 btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
@@ -696,57 +850,56 @@
                 if(data.status === "success" && data.data) {
                     data.data.forEach(w => {
                         if (!days && w.LogDate === today) dailyTotals.burned += w.CaloriesBurned;
-                        tbody.innerHTML += `<tr><td>${w.LogDate}</td><td>${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">X</button></td></tr>`;
+                        tbody.innerHTML += `<tr><td>${w.LogDate}</td><td style="font-weight: 500;">${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">Delete</button></td></tr>`;
                     });
                 }
                 updateNetDeficit();
             });
         }
 
-        // --- DASHBOARD REFRESH ---
         function loadDashboardData() {
-            if (!currentUserId) return;
-            console.log("Loading dashboard for user:", currentUserId);
+            if (!currentUserId) {
+                ['displayGoal', 'displayBMR', 'displayTarget', 'bmiDisplay'].forEach(id => document.getElementById(id).innerText = "---");
+                return;
+            }
             
             fetch(`/api/get_user?user_id=${currentUserId}`)
             .then(res => res.json())
             .then(data => {
-                console.log("User data received:", data);
                 if(data.status === "success") {
                     const u = data.data;
                     userStats.bmr = u.CalculatedBMR;
                     userStats.target = u.TargetCalories;
                     userStats.goal = u.FitnessGoal;
-                    userStats.current = u;
 
                     document.getElementById('displayGoal').innerText = u.FitnessGoal || "---";
                     document.getElementById('displayBMR').innerText = (u.CalculatedBMR || 0) + " kcal";
                     document.getElementById('displayTarget').innerText = (u.TargetCalories || 0) + " kcal";
                     
-                    // Profile Placeholders (Greyed out current values)
                     document.getElementById('username').placeholder = u.Username || "--";
                     document.getElementById('userAge').placeholder = u.Age || "--";
                     document.getElementById('userWeight').placeholder = u.WeightKG || "--";
                     document.getElementById('userHeight').placeholder = u.HeightCM || "--";
                     document.getElementById('userGender').value = u.Gender || "M";
                     document.getElementById('userGoal').value = u.FitnessGoal || "Maintain";
-                    document.getElementById('manualTarget').placeholder = u.TargetCalories || "--";
                     document.getElementById('logWeightVal').placeholder = u.WeightKG || "--";
 
-                    // BMI Calculation
                     if (u.WeightKG && u.HeightCM) {
                         const bmi = (u.WeightKG / ((u.HeightCM / 100) ** 2)).toFixed(1);
                         document.getElementById('bmiDisplay').innerText = bmi;
-                    } else {
-                        document.getElementById('bmiDisplay').innerText = "---";
+                        
+                        // Re-apply gradient for BMI if it gets reset
+                        const bmiEl = document.getElementById('bmiDisplay');
+                        bmiEl.style.background = 'linear-gradient(135deg, #2dd4bf, #0d9488)';
+                        bmiEl.style.webkitBackgroundClip = 'text';
+                        bmiEl.style.webkitTextFillColor = 'transparent';
                     }
 
                     loadMeals();
                     loadWorkouts();
+                    loadWeightHistory();
                 }
-            }).catch(err => console.error("Error loading dashboard data:", err));
-
-            loadWeightHistory();
+            });
         }
 
         window.onload = () => { loadUserList(); };
