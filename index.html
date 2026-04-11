@@ -20,136 +20,203 @@
             --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-dark); color: var(--text-light); margin: 0; display: flex; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased;
         }
 
+        /* --- Animations --- */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .animate-in { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-in {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
+        /* --- Sidebar Navigation --- */
         .sidebar {
-            width: 260px;
-            background-color: var(--bg-dark);
-            border-right: var(--border-subtle);
-            display: flex;
-            flex-direction: column;
-            padding: 2.5rem 1.5rem;
-            position: fixed;
-            height: 100vh;
-            z-index: 10;
+            width: 260px; background-color: var(--bg-dark); border-right: var(--border-subtle); display: flex; flex-direction: column; padding: 2.5rem 1.5rem; position: fixed; height: 100vh; z-index: 10;
         }
 
         .sidebar h1 {
-            font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px;
-            color: var(--text-light); margin-bottom: 2.5rem; padding: 0 0.5rem;
-            display: flex; align-items: center; gap: 0.5rem;
+            font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; color: var(--text-light); margin-bottom: 2.5rem; padding: 0 0.5rem; display: flex; align-items: center; gap: 0.5rem;
         }
 
         .sidebar h1::before {
-            content: ''; display: block; width: 12px; height: 12px;
-            background: var(--primary); border-radius: 50%;
-            box-shadow: 0 0 12px rgba(20, 184, 166, 0.5);
+            content: ''; display: block; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 12px rgba(20, 184, 166, 0.5);
         }
 
         .nav-link {
-            color: var(--text-muted); text-decoration: none; padding: 0.8rem 1rem;
-            border-radius: 10px; margin-bottom: 0.5rem; cursor: pointer;
-            transition: var(--transition-smooth); font-size: 0.95rem; font-weight: 500;
+            color: var(--text-muted); text-decoration: none; padding: 0.8rem 1rem; border-radius: 10px; margin-bottom: 0.5rem; cursor: pointer; transition: var(--transition-smooth); font-size: 0.95rem; font-weight: 500;
         }
 
-        .nav-link:hover { color: var(--text-light); background-color: rgba(255, 255, 255, 0.03); transform: translateX(4px); }
-        .nav-link.active { background-color: var(--surface); color: var(--primary); border: var(--border-subtle); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .nav-link:hover {
+            color: var(--text-light); background-color: rgba(255, 255, 255, 0.03); transform: translateX(4px);
+        }
 
-        .main-content { margin-left: 260px; flex: 1; padding: 3rem; width: calc(100% - 260px);  max-width: 1400px; height: 100vh; overflow-y: auto;}
+        .nav-link.active {
+            background-color: var(--surface); color: var(--primary); border: var(--border-subtle); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+        /* --- Main Content --- */
+        .main-content {
+            margin-left: 260px; flex: 1; padding: 3rem; width: calc(100% - 260px); max-width: 1400px; height: 100vh; overflow-y: auto;
+        }
+
+        .header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; background: transparent; padding: 0;
+        }
 
         .stats-strip {
-            display: flex; gap: 2rem; font-size: 0.95rem; color: var(--text-muted);
-            background: var(--surface); padding: 1rem 1.5rem; border-radius: var(--border-radius); border: var(--border-subtle);
+            display: flex; gap: 2rem; font-size: 0.95rem; color: var(--text-muted); background: var(--surface); padding: 1rem 1.5rem; border-radius: var(--border-radius); border: var(--border-subtle);
         }
         
-        .stats-strip strong { color: var(--text-light); font-weight: 600; margin-left: 0.3rem; }
+        .stats-strip strong { 
+            color: var(--text-light); font-weight: 600; margin-left: 0.3rem;
+        }
 
         .user-controls select {
-            background: var(--surface); border: var(--border-subtle); padding: 0.6rem 1rem;
-            border-radius: 8px; color: var(--text-light); font-weight: 500; cursor: pointer; transition: var(--transition-smooth);
+            background: var(--surface); border: var(--border-subtle); padding: 0.6rem 1rem; border-radius: 8px; color: var(--text-light); font-weight: 500; cursor: pointer; transition: var(--transition-smooth);
         }
         
-        .user-controls select:hover { border-color: rgba(255,255,255,0.2); }
+        .user-controls select:hover {
+            border-color: rgba(255,255,255,0.2);
+        }
 
-        .view-section { display: none; }
-        .view-section.active { display: block; }
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
 
         .dashboard-grid {
-            display: grid;
-            /* This automatically drops it to 1 column if the screen gets too small for 2 */
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 1.5rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem;
         }
 
-        .card { background-color: var(--surface); padding: 2rem; border-radius: var(--border-radius); border: var(--border-subtle); margin-bottom: 1.5rem; transition: var(--transition-smooth); max-height: 60vh; overflow-y: auto; }
+        /* --- Premium Cards --- */
+        .card {
+            background-color: var(--surface); padding: 2rem; border-radius: var(--border-radius); border: var(--border-subtle); margin-bottom: 1.5rem; transition: var(--transition-smooth); max-height: 60vh; overflow-y: auto;
+        }
 
-        .card:hover { border-color: rgba(255,255,255,0.15); box-shadow: 0 8px 30px rgba(0,0,0,0.4); transform: translateY(-2px); }
+        .card:hover {
+            border-color: rgba(255,255,255,0.15); box-shadow: 0 8px 30px rgba(0,0,0,0.4); transform: translateY(-2px);
+        }
 
-        .card h2 { margin-top: 0; font-size: 1.1rem; font-weight: 600; color: var(--text-light); margin-bottom: 1.5rem; }
+        .card h2 {
+            margin-top: 0; font-size: 1.1rem; font-weight: 600; color: var(--text-light); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;
+        }
 
-        .kpi-container { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .kpi-card { flex: 1; text-align: left; }
+        /* --- KPIs (Gradient Text) --- */
+        .kpi-container {
+            display: flex; gap: 1.5rem; margin-bottom: 1.5rem;
+        }
+
+        .kpi-card {
+            flex: 1; text-align: left;
+        }
+
         .kpi-value {
-            font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; margin: 0.5rem 0;
-            background: linear-gradient(135deg, #2dd4bf, #0d9488); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; margin: 0.5rem 0; background: linear-gradient(135deg, #2dd4bf, #0d9488); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .form-group { 
-            margin-bottom: 1.2rem; 
-            display: flex; 
-            flex-direction: column; 
-            min-width: 0; /* THE FIX: Allows the group to shrink inside a flexbox */
+        /* --- Forms & Inputs --- */
+        .form-group {
+            margin-bottom: 1.2rem; display: flex; flex-direction: column; min-width: 0;
         }
-        label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 500; }
+
+        label {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 500;
+        }
+
         input, select {
-            background-color: var(--bg-dark); 
-            border: var(--border-subtle); 
-            color: var(--text-light);
-            padding: 0.8rem 1rem; 
-            border-radius: 8px; 
-            font-size: 0.95rem; 
-            transition: var(--transition-smooth);
-            width: 100%; /* THE FIX: Forces inputs to obey container walls */
+            background-color: var(--bg-dark); border: var(--border-subtle); color: var(--text-light); padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem; transition: var(--transition-smooth); width: 100%;
         }
-        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2); }
 
+        input:focus, select:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
+        }
+
+        /* --- Buttons --- */
         button {
-            background-color: var(--text-light); color: var(--bg-dark); border: none; padding: 0.8rem;
-            width: 100%; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: var(--transition-smooth); margin-top: 0.5rem;
+            background-color: var(--text-light); color: var(--bg-dark); border: none; padding: 0.8rem; width: 100%; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: var(--transition-smooth); margin-top: 0.5rem;
         }
-        button:hover { background-color: #e4e4e7; transform: scale(0.98); }
-        button[type="submit"] { background-color: var(--primary); color: #fff; }
-        button[type="submit"]:hover { background-color: var(--primary-hover); }
 
-        table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        th, td { padding: 1rem 0.5rem; text-align: left; border-bottom: var(--border-subtle); font-size: 0.9rem; }
-        th { color: var(--text-muted); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        button:hover {
+            background-color: #e4e4e7; transform: scale(0.98);
+        }
 
-        .btn-delete { background-color: transparent; color: var(--text-muted); border: 1px solid transparent; padding: 0.3rem 0.6rem; width: auto; border-radius: 6px; }
-        .btn-delete:hover { background-color: rgba(244, 63, 94, 0.1); color: var(--danger); border-color: rgba(244, 63, 94, 0.2); transform: none; }
+        button[type="submit"] {
+            background-color: var(--primary); color: #fff;
+        }
 
-        .filter-btns { display: flex; gap: 0.5rem; background: var(--bg-dark); padding: 0.3rem; border-radius: 8px; border: var(--border-subtle); }
-        .btn-mini { padding: 0.4rem 0.8rem; font-size: 0.75rem; width: auto; background: transparent; color: var(--text-muted); border: none; margin-top: 0; border-radius: 6px; }
-        .btn-mini.active { background: var(--surface-hover); color: var(--text-light); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        button[type="submit"]:hover {
+            background-color: var(--primary-hover);
+        }
 
-        .builder-day { background: var(--bg-dark); border: var(--border-subtle); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
-        .builder-day h3 { margin-top: 0; font-size: 1rem; color: var(--primary); display: flex; justify-content: space-between; }
-        .builder-exercise { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
-        .routine-item { border-left: 2px solid var(--primary); padding-left: 1rem; margin-bottom: 1rem; }
+        /* --- Tables --- */
+        table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+        }
 
+        th, td {
+            padding: 1rem 0.5rem; text-align: left; border-bottom: var(--border-subtle); font-size: 0.9rem;
+        }
+
+        th {
+            color: var(--text-muted); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;
+        }
+
+        .btn-delete {
+            background-color: transparent; color: var(--text-muted); border: 1px solid transparent; padding: 0.3rem 0.6rem; width: auto; border-radius: 6px;
+        }
+
+        .btn-delete:hover {
+            background-color: rgba(244, 63, 94, 0.1); color: var(--danger); border-color: rgba(244, 63, 94, 0.2); transform: none;
+        }
+
+        .filter-btns {
+            display: flex; gap: 0.5rem; background: var(--bg-dark); padding: 0.3rem; border-radius: 8px; border: var(--border-subtle);
+        }
+
+        .btn-mini {
+            padding: 0.4rem 0.8rem; font-size: 0.75rem; width: auto; background: transparent; color: var(--text-muted); border: none; margin-top: 0; border-radius: 6px;
+        }
+
+        .btn-mini.active {
+            background: var(--surface-hover); color: var(--text-light); box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* --- Routine Builder Specific Styles --- */
+        .builder-day { 
+            background: var(--bg-dark); border: var(--border-subtle); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; 
+        }
+        
+        .builder-day h3 { 
+            margin-top: 0; font-size: 1rem; color: var(--primary); display: flex; justify-content: space-between; 
+        }
+        
+        .builder-exercise { 
+            display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; 
+        }
+        
+        .routine-item { 
+            border-left: 2px solid var(--primary); padding-left: 1rem; margin-bottom: 1rem; 
+        }
+
+        /* --- Premium Custom Scrollbar --- */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -218,20 +285,55 @@
 
         <section id="meals" class="view-section">
             <div class="dashboard-grid">
+                
                 <div class="card animate-in">
                     <h2>Log Nutrition</h2>
                     <form id="mealForm">
-                        <div class="form-group"><label>Date</label><input type="date" id="mealDate" required></div>
-                        <div class="form-group"><label>Food Item</label><input type="text" id="foodItem" placeholder="e.g., Grilled Salmon & Quinoa" required></div>
-                        <div class="form-group"><label>Total Calories</label><input type="number" id="mealCals" required></div>
-                        <div style="display: flex; gap: 0.8rem;">
-                            <div class="form-group" style="flex: 1;"><label>Pro (g)</label><input type="number" id="mealProtein" value="0"></div>
-                            <div class="form-group" style="flex: 1;"><label>Carb (g)</label><input type="number" id="mealCarbs" value="0"></div>
-                            <div class="form-group" style="flex: 1;"><label>Fat (g)</label><input type="number" id="mealFats" value="0"></div>
+                        
+                        <div class="form-group">
+                            <label>Quick Auto-Fill</label>
+                            <select id="savedRecipeSelector" style="border-color: var(--primary);">
+                                <option value="">Select a saved meal...</option>
+                            </select>
                         </div>
-                        <button type="submit">Log Meal</button>
+
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="mealDate" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Food Item</label>
+                            <input type="text" id="foodItem" placeholder="e.g., Grilled Salmon & Quinoa" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Total Calories</label>
+                            <input type="number" id="mealCals" required>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.8rem;">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Pro (g)</label>
+                                <input type="number" id="mealProtein" value="0">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Carb (g)</label>
+                                <input type="number" id="mealCarbs" value="0">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Fat (g)</label>
+                                <input type="number" id="mealFats" value="0">
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <button type="submit" style="flex: 2;">Log Meal</button>
+                            <button type="button" id="btnSaveAsRecipe" style="flex: 1; background: transparent; border: 1px dashed var(--primary); color: var(--primary);">Save as Recipe</button>
+                        </div>
                     </form>
                 </div>
+
                 <div class="card animate-in" style="animation-delay: 0.1s;">
                     <h2 style="display: flex; justify-content: space-between;">Recent Intake
                         <div class="filter-btns">
@@ -240,7 +342,15 @@
                         </div>
                     </h2>
                     <table id="mealTable">
-                        <thead><tr><th>Date</th><th>Item</th><th>Kcal</th><th>Macros</th><th></th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Item</th>
+                                <th>Kcal</th>
+                                <th>Macros</th>
+                                <th></th>
+                            </tr>
+                        </thead>
                         <tbody id="mealTableBody"></tbody>
                     </table>
                 </div>
@@ -249,14 +359,27 @@
 
         <section id="workouts" class="view-section">
             <div class="dashboard-grid">
+                
                 <div class="card animate-in">
                     <h2>Log Manual Activity</h2>
                     <form id="workoutForm">
-                        <div class="form-group"><label>Date</label><input type="date" id="workoutDate" required></div>
-                        <div class="form-group"><label>Category</label><input type="text" id="workoutCategory" placeholder="e.g., Push Day or LISS" required></div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="workoutDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" id="workoutCategory" placeholder="e.g., Push Day or LISS" required>
+                        </div>
                         <div style="display: flex; gap: 1rem;">
-                            <div class="form-group" style="flex: 1;"><label>Duration (min)</label><input type="number" id="workoutDuration" required></div>
-                            <div class="form-group" style="flex: 1;"><label>Energy Burned</label><input type="number" id="workoutCals" required></div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Duration (min)</label>
+                                <input type="number" id="workoutDuration" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Energy Burned</label>
+                                <input type="number" id="workoutCals" required>
+                            </div>
                         </div>
                         <button type="submit">Log Session</button>
                     </form>
@@ -280,6 +403,7 @@
                             <label>Routine Name</label>
                             <input type="text" id="routineName" placeholder="e.g., 6-Week Hypertrophy" required>
                         </div>
+                        
                         <div id="routineDaysContainer"></div>
                         
                         <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
@@ -293,7 +417,15 @@
             <div class="card animate-in" style="animation-delay: 0.2s;">
                 <h2>Activity History</h2>
                 <table id="workoutTable">
-                    <thead><tr><th>Date</th><th>Protocol</th><th>Time</th><th>Kcal</th><th></th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Protocol</th>
+                            <th>Time</th>
+                            <th>Kcal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
                     <tbody id="workoutTableBody"></tbody>
                 </table>
             </div>
@@ -304,17 +436,45 @@
                 <div class="card animate-in">
                     <h2>Biometric Data</h2>
                     <form id="profileForm">
-                        <div class="form-group"><label>Display Name</label><input type="text" id="username" placeholder="--" required></div>
-                        <div style="display: flex; gap: 1rem;">
-                            <div class="form-group" style="flex: 1;"><label>Age</label><input type="number" id="userAge" placeholder="--" required></div>
-                            <div class="form-group" style="flex: 1;"><label>Gender</label><select id="userGender"><option value="M">Male</option><option value="F">Female</option></select></div>
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input type="text" id="username" placeholder="--" required>
                         </div>
                         <div style="display: flex; gap: 1rem;">
-                            <div class="form-group" style="flex: 1;"><label>Weight (kg)</label><input type="number" step="0.1" id="userWeight" placeholder="--" required></div>
-                            <div class="form-group" style="flex: 1;"><label>Height (cm)</label><input type="number" step="0.1" id="userHeight" placeholder="--" required></div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Age</label>
+                                <input type="number" id="userAge" placeholder="--" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Gender</label>
+                                <select id="userGender">
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group"><label>Protocol Goal</label><select id="userGoal"><option value="Cut">Cut (-500 kcal)</option><option value="Maintain">Maintenance</option><option value="Bulk">Bulk (+500 kcal)</option></select></div>
-                        <div class="form-group"><label>Manual Calorie Target</label><input type="number" id="manualTarget" placeholder="Leave empty for auto-calculation"></div>
+                        <div style="display: flex; gap: 1rem;">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Weight (kg)</label>
+                                <input type="number" step="0.1" id="userWeight" placeholder="--" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Height (cm)</label>
+                                <input type="number" step="0.1" id="userHeight" placeholder="--" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Protocol Goal</label>
+                            <select id="userGoal">
+                                <option value="Cut">Cut (-500 kcal)</option>
+                                <option value="Maintain">Maintenance</option>
+                                <option value="Bulk">Bulk (+500 kcal)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Manual Calorie Target</label>
+                            <input type="number" id="manualTarget" placeholder="Leave empty for auto-calculation">
+                        </div>
                         <button type="submit">Sync Profile</button>
                         <button type="button" id="btnNewUser" style="background: transparent; color: var(--text-muted); border: var(--border-subtle); margin-top: 0.8rem;">Initialize New Profile</button>
                     </form>
@@ -322,8 +482,14 @@
                 <div class="card animate-in" style="animation-delay: 0.1s;">
                     <h2>Weight Check-in</h2>
                     <form id="weightForm">
-                        <div class="form-group"><label>Date</label><input type="date" id="weightDate" required></div>
-                        <div class="form-group"><label>Current Mass (kg)</label><input type="number" step="0.1" id="logWeightVal" placeholder="--" required></div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="weightDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Mass (kg)</label>
+                            <input type="number" step="0.1" id="logWeightVal" placeholder="--" required>
+                        </div>
                         <button type="submit">Log Weight</button>
                     </form>
                 </div>
@@ -332,21 +498,25 @@
     </main>
 
     <script>
+        // --- GLOBAL VARIABLES & INIT ---
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('mealDate').value = today;
         document.getElementById('workoutDate').value = today;
         document.getElementById('weightDate').value = today;
 
         let currentUserId = localStorage.getItem('selectedUserId');
-        if (currentUserId === "null" || currentUserId === "undefined" || currentUserId === "") currentUserId = null;
+        
+        if (currentUserId === "null" || currentUserId === "undefined" || currentUserId === "") {
+            currentUserId = null;
+        }
 
         let userStats = { bmr: 0, target: 0, goal: 'Maintain', current: {} };
         let dailyTotals = { consumed: 0, burned: 0 };
         
         let masterExercises = []; 
         let routineDayCount = 0; 
+        let customRecipes = [];
 
-        // --- NEW: ROUTINE TEMPLATES ---
         const routineTemplates = {
             'ppl': {
                 name: "Classic PPL Split",
@@ -401,12 +571,24 @@
 
         // --- CORE UI LOGIC ---
         function switchView(viewId, el) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.remove('active');
+            });
+            
             const activeView = document.getElementById(viewId);
             activeView.classList.add('active');
+            
             const cards = activeView.querySelectorAll('.animate-in');
-            cards.forEach(card => { card.style.animation = 'none'; card.offsetHeight; card.style.animation = null; });
+            cards.forEach(card => { 
+                card.style.animation = 'none'; 
+                card.offsetHeight; 
+                card.style.animation = null; 
+            });
+            
             el.classList.add('active');
         }
 
@@ -417,50 +599,85 @@
             const label = document.getElementById('netStatusLabel');
             
             display.innerText = `${Math.abs(status)} kcal`;
+            
             if (status <= 0) {
-                display.style.background = 'none'; display.style.webkitTextFillColor = 'var(--success)';
+                display.style.background = 'none'; 
+                display.style.webkitTextFillColor = 'var(--success)';
                 label.innerText = 'Budget Remaining';
             } else {
-                display.style.background = 'none'; display.style.webkitTextFillColor = 'var(--danger)';
+                display.style.background = 'none'; 
+                display.style.webkitTextFillColor = 'var(--danger)';
                 label.innerText = 'Over Daily Target';
             }
         }
 
         function deleteEntry(id, type) {
             if (!confirm(`Delete this ${type}?`)) return;
+            
             fetch('/api/delete_entry', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: currentUserId, entry_id: id, type: type })
-            }).then(() => loadDashboardData());
-        }
-
-        function loadUserList() {
-            fetch('/api/get_users').then(res => res.json()).then(data => {
-                if(data.status !== "success") return;
-                const selector = document.getElementById('userSelector'); selector.innerHTML = '';
-                if (data.data.length > 0 && !currentUserId) { currentUserId = data.data[0].UserID; localStorage.setItem('selectedUserId', currentUserId); }
-                data.data.forEach(u => {
-                    const opt = document.createElement('option'); opt.value = u.UserID; opt.innerText = u.Username;
-                    if (u.UserID == currentUserId) opt.selected = true; selector.appendChild(opt);
-                });
+            })
+            .then(() => {
                 loadDashboardData();
             });
         }
 
-        document.getElementById('userSelector').addEventListener('change', (e) => { currentUserId = e.target.value; localStorage.setItem('selectedUserId', currentUserId); loadDashboardData(); });
-        document.getElementById('btnNewUser').addEventListener('click', () => { currentUserId = null; localStorage.removeItem('selectedUserId'); document.getElementById('profileForm').reset(); switchView('profile', document.querySelector('.nav-link:nth-child(4)')); });
+        function loadUserList() {
+            fetch('/api/get_users')
+            .then(res => res.json())
+            .then(data => {
+                if(data.status !== "success") return;
+                
+                const selector = document.getElementById('userSelector'); 
+                selector.innerHTML = '';
+                
+                if (data.data.length > 0 && !currentUserId) { 
+                    currentUserId = data.data[0].UserID; 
+                    localStorage.setItem('selectedUserId', currentUserId); 
+                }
+                
+                data.data.forEach(u => {
+                    const opt = document.createElement('option'); 
+                    opt.value = u.UserID; 
+                    opt.innerText = u.Username;
+                    if (u.UserID == currentUserId) opt.selected = true; 
+                    selector.appendChild(opt);
+                });
+                
+                loadDashboardData();
+            });
+        }
+
+        document.getElementById('userSelector').addEventListener('change', (e) => { 
+            currentUserId = e.target.value; 
+            localStorage.setItem('selectedUserId', currentUserId); 
+            loadDashboardData(); 
+        });
+
+        document.getElementById('btnNewUser').addEventListener('click', () => { 
+            currentUserId = null; 
+            localStorage.removeItem('selectedUserId'); 
+            document.getElementById('profileForm').reset(); 
+            switchView('profile', document.querySelector('.nav-link:nth-child(4)')); 
+        });
 
         // --- ROUTINE BUILDER & TEMPLATE LOGIC ---
         function fetchMasterExercises() {
-            fetch('/api/get_exercises').then(res => res.json()).then(data => { if(data.status === "success") masterExercises = data.data; });
+            fetch('/api/get_exercises')
+            .then(res => res.json())
+            .then(data => { 
+                if(data.status === "success") masterExercises = data.data; 
+            });
         }
 
-        // UPGRADED: Accepts default data from templates
         function addRoutineDay(defaultName = '') {
             routineDayCount++;
             const dayId = routineDayCount;
             const container = document.getElementById('routineDaysContainer');
             const dayDiv = document.createElement('div');
+            
             dayDiv.className = 'builder-day';
             dayDiv.id = `builder-day-${dayId}`;
             
@@ -470,13 +687,15 @@
                 <div id="exercises-for-day-${dayId}"></div>
                 <button type="button" onclick="addExerciseToDay(${dayId})" style="background: var(--bg-dark); color: var(--text-light); font-size: 0.8rem; padding: 0.4rem;">+ Add Exercise</button>
             `;
+            
             container.appendChild(dayDiv);
             
-            if (!defaultName) addExerciseToDay(dayId); // Only add a blank exercise if building from scratch
+            if (!defaultName) {
+                addExerciseToDay(dayId);
+            }
             return dayId;
         }
 
-        // UPGRADED: Accepts default data from templates
         function addExerciseToDay(dayId, exName = '', sets = '', reps = '') {
             const exContainer = document.getElementById(`exercises-for-day-${dayId}`);
             const exDiv = document.createElement('div');
@@ -487,7 +706,7 @@
             
             masterExercises.forEach(ex => { 
                 options += `<option value="${ex.ExerciseID}">${ex.Name} (${ex.MuscleGroup})</option>`; 
-                if (ex.Name === exName) targetExId = ex.ExerciseID; // Match string to database ID
+                if (ex.Name === exName) targetExId = ex.ExerciseID; 
             });
 
             exDiv.innerHTML = `
@@ -496,31 +715,28 @@
                 <input type="text" class="ex-reps" placeholder="Reps" value="${reps}" required style="flex: 1; padding: 0.5rem;">
                 <button type="button" class="btn-delete" style="padding: 0.5rem;" onclick="this.parentElement.remove()">X</button>
             `;
+            
             exContainer.appendChild(exDiv);
 
-            // Set the dropdown to the correct preset exercise
             if (targetExId) {
                 exContainer.lastElementChild.querySelector('.ex-id').value = targetExId;
             }
         }
 
-        // NEW: Template Listener
         document.getElementById('routineTemplateSelector').addEventListener('change', function(e) {
             const val = e.target.value;
             const container = document.getElementById('routineDaysContainer');
             const nameInput = document.getElementById('routineName');
 
-            // Wipe current UI
             container.innerHTML = '';
             routineDayCount = 0;
 
             if (val === 'custom') {
                 nameInput.value = '';
-                addRoutineDay(); // Give them a blank canvas
+                addRoutineDay();
                 return;
             }
 
-            // Load selected template
             const tpl = routineTemplates[val];
             nameInput.value = tpl.name;
 
@@ -534,6 +750,7 @@
 
         document.getElementById('routineBuilderForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
             if (!currentUserId) return alert("Select a profile first.");
 
             const routineName = document.getElementById('routineName').value;
@@ -554,14 +771,24 @@
                     });
                 });
                 
-                if(exercises.length > 0) days.push({ day_name: dayName, exercises: exercises });
+                if(exercises.length > 0) {
+                    days.push({ day_name: dayName, exercises: exercises });
+                }
             });
 
-            const payload = { user_id: currentUserId, routine_name: routineName, days: days };
+            const payload = { 
+                user_id: currentUserId, 
+                routine_name: routineName, 
+                days: days 
+            };
 
             fetch('/api/add_routine', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-            }).then(res => res.json()).then(data => {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
                 if(data.status === "success") {
                     alert("Routine activated! Check your Dashboard.");
                     this.reset();
@@ -569,24 +796,33 @@
                     routineDayCount = 0;
                     document.getElementById('routineTemplateSelector').value = 'custom';
                     loadDashboardWidget(); 
-                } else alert("Error: " + data.message);
+                } else {
+                    alert("Error: " + data.message);
+                }
             });
         });
 
         function loadDashboardWidget() {
             if (!currentUserId) return;
+            
             const widget = document.getElementById('routineWidget');
             const title = document.getElementById('routineWidgetTitle');
             
-            fetch(`/api/get_active_routine?user_id=${currentUserId}`).then(res => res.json()).then(data => {
+            fetch(`/api/get_active_routine?user_id=${currentUserId}`)
+            .then(res => res.json())
+            .then(data => {
                 if(data.status === "success" && data.data) {
-                    const r = data.data; title.innerText = `Active Protocol: ${r.RoutineName}`;
+                    const r = data.data; 
+                    title.innerText = `Active Protocol: ${r.RoutineName}`;
+                    
                     if (r.days && r.days.length > 0) {
                         const todaySplit = r.days[0]; 
                         let html = `<h3 style="color: var(--text-light); margin-top: 0;">${todaySplit.DayName}</h3>`;
+                        
                         todaySplit.exercises.forEach(ex => {
                             html += `<div class="routine-item"><strong style="color: var(--text-light);">${ex.ExerciseName}</strong><br>${ex.TargetSets} Sets x ${ex.TargetReps} Reps <span style="font-size: 0.8rem; color: var(--primary);">[${ex.MuscleGroup}]</span></div>`;
                         });
+                        
                         html += `<button onclick="switchView('workouts', document.querySelector('.nav-link:nth-child(3)'))" style="background: rgba(255,255,255,0.05); color: var(--primary); border: 1px solid var(--primary);">Go to Tracker</button>`;
                         widget.innerHTML = html;
                     }
@@ -597,73 +833,294 @@
             });
         }
 
+        // --- RECIPE ENGINE LOGIC ---
+        function loadRecipes() {
+            if (!currentUserId) return;
+            
+            fetch(`/api/get_recipes?user_id=${currentUserId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    customRecipes = data.data;
+                    const selector = document.getElementById('savedRecipeSelector');
+                    selector.innerHTML = '<option value="">Select a saved meal...</option>';
+                    customRecipes.forEach(r => {
+                        selector.innerHTML += `<option value="${r.RecipeID}">${r.RecipeName} (${r.Calories} kcal)</option>`;
+                    });
+                }
+            });
+        }
+
+        document.getElementById('savedRecipeSelector').addEventListener('change', function(e) {
+            const recipeId = parseInt(e.target.value);
+            if (!recipeId) return;
+            
+            const recipe = customRecipes.find(r => r.RecipeID === recipeId);
+            if (recipe) {
+                document.getElementById('foodItem').value = recipe.RecipeName;
+                document.getElementById('mealCals').value = recipe.Calories;
+                document.getElementById('mealProtein').value = recipe.ProteinGrams;
+                document.getElementById('mealCarbs').value = recipe.CarbsGrams;
+                document.getElementById('mealFats').value = recipe.FatsGrams;
+            }
+        });
+
+        document.getElementById('btnSaveAsRecipe').addEventListener('click', function() {
+            if (!currentUserId) return alert("Select a profile first.");
+            
+            const name = document.getElementById('foodItem').value;
+            const cals = document.getElementById('mealCals').value;
+            
+            if (!name || !cals) return alert("Fill out at least the Food Item and Calories to save a recipe.");
+
+            const payload = {
+                user_id: currentUserId,
+                recipe_name: name,
+                calories: parseInt(cals),
+                protein: parseInt(document.getElementById('mealProtein').value || 0),
+                carbs: parseInt(document.getElementById('mealCarbs').value || 0),
+                fats: parseInt(document.getElementById('mealFats').value || 0)
+            };
+
+            fetch('/api/add_recipe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    alert(`${name} added to your Recipe Library!`);
+                    loadRecipes();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            });
+        });
+
         // --- STANDARD LOGGING FORMS ---
         document.getElementById('weightForm').addEventListener('submit', function(e) {
-            e.preventDefault(); const val = document.getElementById('logWeightVal').value || document.getElementById('logWeightVal').placeholder;
-            fetch('/api/add_weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, date: document.getElementById('weightDate').value, weight: parseFloat(val) }) })
-            .then(res => res.json()).then(data => { if(data.status === "success") alert("Weight logged!"); e.target.reset(); document.getElementById('weightDate').value = today; loadDashboardData(); });
+            e.preventDefault(); 
+            
+            const val = document.getElementById('logWeightVal').value || document.getElementById('logWeightVal').placeholder;
+            
+            fetch('/api/add_weight', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ user_id: currentUserId, date: document.getElementById('weightDate').value, weight: parseFloat(val) }) 
+            })
+            .then(res => res.json())
+            .then(data => { 
+                if(data.status === "success") alert("Weight logged!"); 
+                e.target.reset(); 
+                document.getElementById('weightDate').value = today; 
+                loadDashboardData(); 
+            });
         });
 
         function loadWeightHistory() {
             if (!currentUserId) return;
-            fetch(`/api/get_weight?user_id=${currentUserId}`).then(res => res.json()).then(data => {
-                const list = document.getElementById('weightHistoryList'); list.innerHTML = '';
-                if(data.status === "success") data.data.forEach(w => list.innerHTML += `<div style="display: flex; justify-content: space-between; border-bottom: var(--border-subtle); padding-bottom: 0.5rem;"><span>${w.LogDate}</span> <strong style="color: var(--text-light);">${w.WeightKG} kg</strong></div>`);
+            
+            fetch(`/api/get_weight?user_id=${currentUserId}`)
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('weightHistoryList'); 
+                list.innerHTML = '';
+                
+                if(data.status === "success") {
+                    data.data.forEach(w => {
+                        list.innerHTML += `<div style="display: flex; justify-content: space-between; border-bottom: var(--border-subtle); padding-bottom: 0.5rem;"><span>${w.LogDate}</span> <strong style="color: var(--text-light);">${w.WeightKG} kg</strong></div>`;
+                    });
+                }
             });
         }
 
         document.getElementById('profileForm').addEventListener('submit', function(e) {
-            e.preventDefault(); const getVal = (id) => document.getElementById(id).value || document.getElementById(id).placeholder;
-            const payload = { user_id: currentUserId, username: getVal('username'), age: parseInt(getVal('userAge')), weight: parseFloat(getVal('userWeight')), height: parseFloat(getVal('userHeight')), gender: document.getElementById('userGender').value, goal: document.getElementById('userGoal').value, manualTarget: document.getElementById('manualTarget').value };
+            e.preventDefault(); 
+            
+            const getVal = (id) => document.getElementById(id).value || document.getElementById(id).placeholder;
+            
+            const payload = { 
+                user_id: currentUserId, 
+                username: getVal('username'), 
+                age: parseInt(getVal('userAge')), 
+                weight: parseFloat(getVal('userWeight')), 
+                height: parseFloat(getVal('userHeight')), 
+                gender: document.getElementById('userGender').value, 
+                goal: document.getElementById('userGoal').value, 
+                manualTarget: document.getElementById('manualTarget').value 
+            };
+            
             let bmr = Math.round((10 * payload.weight) + (6.25 * payload.height) - (5 * payload.age) + (payload.gender === 'M' ? 5 : -161));
-            payload.bmr = bmr; payload.target_calories = payload.manualTarget ? parseInt(payload.manualTarget) : Math.round(bmr * 1.2 + (payload.goal === 'Cut' ? -500 : payload.goal === 'Bulk' ? 500 : 0));
-            fetch('/api/add_user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(res => res.json()).then(data => { if(data.status === "success") { alert("Profile Saved!"); loadUserList(); } });
+            payload.bmr = bmr; 
+            payload.target_calories = payload.manualTarget ? parseInt(payload.manualTarget) : Math.round(bmr * 1.2 + (payload.goal === 'Cut' ? -500 : payload.goal === 'Bulk' ? 500 : 0));
+            
+            fetch('/api/add_user', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            })
+            .then(res => res.json())
+            .then(data => { 
+                if(data.status === "success") { 
+                    alert("Profile Saved!"); 
+                    loadUserList(); 
+                } 
+            });
         });
 
         document.getElementById('mealForm').addEventListener('submit', function(e) {
-            e.preventDefault(); const payload = { user_id: currentUserId, date: document.getElementById('mealDate').value, food: document.getElementById('foodItem').value, calories: parseInt(document.getElementById('mealCals').value || 0), protein: parseInt(document.getElementById('mealProtein').value || 0), carbs: parseInt(document.getElementById('mealCarbs').value || 0), fats: parseInt(document.getElementById('mealFats').value || 0) };
-            fetch('/api/add_meal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(() => { e.target.reset(); document.getElementById('mealDate').value = today; loadDashboardData(); });
+            e.preventDefault(); 
+            
+            const payload = { 
+                user_id: currentUserId, 
+                date: document.getElementById('mealDate').value, 
+                food: document.getElementById('foodItem').value, 
+                calories: parseInt(document.getElementById('mealCals').value || 0), 
+                protein: parseInt(document.getElementById('mealProtein').value || 0), 
+                carbs: parseInt(document.getElementById('mealCarbs').value || 0), 
+                fats: parseInt(document.getElementById('mealFats').value || 0) 
+            };
+            
+            fetch('/api/add_meal', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            })
+            .then(() => { 
+                e.target.reset(); 
+                document.getElementById('mealDate').value = today; 
+                loadDashboardData(); 
+            });
         });
 
         document.getElementById('workoutForm').addEventListener('submit', function(e) {
-            e.preventDefault(); const payload = { user_id: currentUserId, date: document.getElementById('workoutDate').value, category: document.getElementById('workoutCategory').value, duration: parseInt(document.getElementById('workoutDuration').value || 0), calories: parseInt(document.getElementById('workoutCals').value || 0) };
-            fetch('/api/add_workout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(() => { e.target.reset(); document.getElementById('workoutDate').value = today; loadDashboardData(); });
+            e.preventDefault(); 
+            
+            const payload = { 
+                user_id: currentUserId, 
+                date: document.getElementById('workoutDate').value, 
+                category: document.getElementById('workoutCategory').value, 
+                duration: parseInt(document.getElementById('workoutDuration').value || 0), 
+                calories: parseInt(document.getElementById('workoutCals').value || 0) 
+            };
+            
+            fetch('/api/add_workout', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            })
+            .then(() => { 
+                e.target.reset(); 
+                document.getElementById('workoutDate').value = today; 
+                loadDashboardData(); 
+            });
         });
 
         function loadMeals(days = null, btn = null) {
-            if (!currentUserId) return; if (btn) { btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+            if (!currentUserId) return; 
+            
+            if (btn) { 
+                btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active')); 
+                btn.classList.add('active'); 
+            }
+            
             const url = days ? `/api/get_meals?user_id=${currentUserId}&days=${days}` : `/api/get_meals?user_id=${currentUserId}`;
-            fetch(url).then(res => res.json()).then(data => {
-                const tbody = document.getElementById('mealTableBody'); tbody.innerHTML = ''; if (!days) dailyTotals.consumed = 0;
-                if(data.status === "success" && data.data) data.data.forEach(m => { if (!days && m.LogDate === today) dailyTotals.consumed += m.Calories; tbody.innerHTML += `<tr><td>${m.LogDate}</td><td style="font-weight: 500;">${m.FoodItem}</td><td>${m.Calories}</td><td><span style="color: var(--text-muted);">${m.ProteinGrams}p / ${m.CarbsGrams}c / ${m.FatsGrams}f</span></td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">Delete</button></td></tr>`; });
+            
+            fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('mealTableBody'); 
+                tbody.innerHTML = ''; 
+                
+                if (!days) dailyTotals.consumed = 0;
+                
+                if(data.status === "success" && data.data) {
+                    data.data.forEach(m => { 
+                        if (!days && m.LogDate === today) dailyTotals.consumed += m.Calories; 
+                        tbody.innerHTML += `<tr><td>${m.LogDate}</td><td style="font-weight: 500;">${m.FoodItem}</td><td>${m.Calories}</td><td><span style="color: var(--text-muted);">${m.ProteinGrams}p / ${m.CarbsGrams}c / ${m.FatsGrams}f</span></td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">Delete</button></td></tr>`; 
+                    });
+                }
                 updateNetDeficit();
             });
         }
 
         function loadWorkouts(days = null, btn = null) {
-            if (!currentUserId) return; if (btn) { btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+            if (!currentUserId) return; 
+            
+            if (btn) { 
+                btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active')); 
+                btn.classList.add('active'); 
+            }
+            
             const url = days ? `/api/get_workouts?user_id=${currentUserId}&days=${days}` : `/api/get_workouts?user_id=${currentUserId}`;
-            fetch(url).then(res => res.json()).then(data => {
-                const tbody = document.getElementById('workoutTableBody'); tbody.innerHTML = ''; if (!days) dailyTotals.burned = 0;
-                if(data.status === "success" && data.data) data.data.forEach(w => { if (!days && w.LogDate === today) dailyTotals.burned += w.CaloriesBurned; tbody.innerHTML += `<tr><td>${w.LogDate}</td><td style="font-weight: 500;">${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">Delete</button></td></tr>`; });
+            
+            fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('workoutTableBody'); 
+                tbody.innerHTML = ''; 
+                
+                if (!days) dailyTotals.burned = 0;
+                
+                if(data.status === "success" && data.data) {
+                    data.data.forEach(w => { 
+                        if (!days && w.LogDate === today) dailyTotals.burned += w.CaloriesBurned; 
+                        tbody.innerHTML += `<tr><td>${w.LogDate}</td><td style="font-weight: 500;">${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">Delete</button></td></tr>`; 
+                    });
+                }
                 updateNetDeficit();
             });
         }
 
         function loadDashboardData() {
-            if (!currentUserId) { ['displayGoal', 'displayBMR', 'displayTarget', 'bmiDisplay'].forEach(id => document.getElementById(id).innerText = "---"); return; }
-            fetch(`/api/get_user?user_id=${currentUserId}`).then(res => res.json()).then(data => {
+            if (!currentUserId) { 
+                ['displayGoal', 'displayBMR', 'displayTarget', 'bmiDisplay'].forEach(id => document.getElementById(id).innerText = "---"); 
+                return; 
+            }
+            
+            fetch(`/api/get_user?user_id=${currentUserId}`)
+            .then(res => res.json())
+            .then(data => {
                 if(data.status === "success") {
-                    const u = data.data; userStats.bmr = u.CalculatedBMR; userStats.target = u.TargetCalories; userStats.goal = u.FitnessGoal;
-                    document.getElementById('displayGoal').innerText = u.FitnessGoal || "---"; document.getElementById('displayBMR').innerText = (u.CalculatedBMR || 0) + " kcal"; document.getElementById('displayTarget').innerText = (u.TargetCalories || 0) + " kcal";
-                    document.getElementById('username').placeholder = u.Username || "--"; document.getElementById('userAge').placeholder = u.Age || "--"; document.getElementById('userWeight').placeholder = u.WeightKG || "--"; document.getElementById('userHeight').placeholder = u.HeightCM || "--"; document.getElementById('userGender').value = u.Gender || "M"; document.getElementById('userGoal').value = u.FitnessGoal || "Maintain"; document.getElementById('logWeightVal').placeholder = u.WeightKG || "--";
-                    if (u.WeightKG && u.HeightCM) { const bmi = (u.WeightKG / ((u.HeightCM / 100) ** 2)).toFixed(1); document.getElementById('bmiDisplay').innerText = bmi; document.getElementById('bmiDisplay').style.background = 'linear-gradient(135deg, #2dd4bf, #0d9488)'; document.getElementById('bmiDisplay').style.webkitBackgroundClip = 'text'; document.getElementById('bmiDisplay').style.webkitTextFillColor = 'transparent'; }
-                    loadMeals(); loadWorkouts(); loadWeightHistory(); loadDashboardWidget();
+                    const u = data.data; 
+                    userStats.bmr = u.CalculatedBMR; 
+                    userStats.target = u.TargetCalories; 
+                    userStats.goal = u.FitnessGoal;
+                    
+                    document.getElementById('displayGoal').innerText = u.FitnessGoal || "---"; 
+                    document.getElementById('displayBMR').innerText = (u.CalculatedBMR || 0) + " kcal"; 
+                    document.getElementById('displayTarget').innerText = (u.TargetCalories || 0) + " kcal";
+                    
+                    document.getElementById('username').placeholder = u.Username || "--"; 
+                    document.getElementById('userAge').placeholder = u.Age || "--"; 
+                    document.getElementById('userWeight').placeholder = u.WeightKG || "--"; 
+                    document.getElementById('userHeight').placeholder = u.HeightCM || "--"; 
+                    document.getElementById('userGender').value = u.Gender || "M"; 
+                    document.getElementById('userGoal').value = u.FitnessGoal || "Maintain"; 
+                    document.getElementById('logWeightVal').placeholder = u.WeightKG || "--";
+                    
+                    if (u.WeightKG && u.HeightCM) { 
+                        const bmi = (u.WeightKG / ((u.HeightCM / 100) ** 2)).toFixed(1); 
+                        document.getElementById('bmiDisplay').innerText = bmi; 
+                        document.getElementById('bmiDisplay').style.background = 'linear-gradient(135deg, #2dd4bf, #0d9488)'; 
+                        document.getElementById('bmiDisplay').style.webkitBackgroundClip = 'text'; 
+                        document.getElementById('bmiDisplay').style.webkitTextFillColor = 'transparent'; 
+                    }
+                    
+                    loadMeals(); 
+                    loadWorkouts(); 
+                    loadWeightHistory(); 
+                    loadDashboardWidget();
+                    loadRecipes();
                 }
             });
         }
 
-        window.onload = () => { fetchMasterExercises(); loadUserList(); };
+        window.onload = () => { 
+            fetchMasterExercises(); 
+            loadUserList(); 
+        };
     </script>
 </body>
 </html>
