@@ -18,13 +18,13 @@
 - [x] **Weight Tracking:** Dedicated weight-log table to track progress over time.
 
 ### 2. The Routine Builder
-- [ ] Create `Routines` and `Routine_Days` tables.
-- [ ] UI to build custom routines (e.g., "PPL Phase 1").
-- [ ] Smart Widget: Suggest today's session based on the active routine.
+- [X] Create `Routines` and `Routine_Days` tables.
+- [X] UI to build custom routines (e.g., "PPL Phase 1").
+- [X] Smart Widget: Suggest today's session based on the active routine.
 
 ### 3. The Recipe Engine
-- [ ] Create `Recipes` table for component-based macro tracking.
-- [ ] UI to build and select pre-saved recipes in the Meal Logger.
+- [X] Create `Recipes` table for component-based macro tracking.
+- [X] UI to build and select pre-saved recipes in the Meal Logger.
 
 ## 🚀 Phase 3: UX & Performance
 - [ ] **Visualizations:** Charts for weight trends and macro distribution (Chart.js).
