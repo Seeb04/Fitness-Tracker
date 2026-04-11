@@ -9,8 +9,7 @@
 
     <style>
         :root {
-            /* Premium SaaS Color Palette (Zinc & Teal) */
-            --bg-dark: #09090b; 
+            var(--bg-dark): #09090b; 
             --surface: #18181b; 
             --surface-hover: #27272a;
             --primary: #14b8a6; 
@@ -30,7 +29,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-dark);
+            background-color: #09090b;
             color: var(--text-light);
             margin: 0;
             display: flex;
@@ -39,7 +38,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* --- Animations --- */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -49,10 +47,9 @@
             animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* --- Sidebar Navigation --- */
         .sidebar {
             width: 260px;
-            background-color: var(--bg-dark);
+            background-color: #09090b;
             border-right: var(--border-subtle);
             display: flex;
             flex-direction: column;
@@ -109,7 +106,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        /* --- Main Content --- */
         .main-content {
             margin-left: 260px;
             flex: 1;
@@ -139,12 +135,47 @@
             padding: 1rem 1.5rem;
             border-radius: var(--border-radius);
             border: var(--border-subtle);
+            align-items: center;
         }
         
         .stats-strip strong { 
             color: var(--text-light); 
             font-weight: 600;
             margin-left: 0.3rem;
+        }
+
+        /* NEW: Hover Tooltip for BMI */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            border-bottom: 1px dotted var(--primary);
+        }
+
+        .tooltip-container .tooltip-text {
+            visibility: hidden;
+            width: max-content;
+            background-color: var(--surface-hover);
+            color: var(--text-light);
+            text-align: center;
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.75rem;
+            border: var(--border-subtle);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-weight: 600;
+        }
+
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
         }
 
         .user-controls select {
@@ -158,17 +189,10 @@
             transition: var(--transition-smooth);
         }
         
-        .user-controls select:hover {
-            border-color: rgba(255,255,255,0.2);
-        }
+        .user-controls select:hover { border-color: rgba(255,255,255,0.2); }
 
-        .view-section {
-            display: none;
-        }
-
-        .view-section.active {
-            display: block;
-        }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
 
         .dashboard-grid {
             display: grid;
@@ -176,20 +200,13 @@
             gap: 1.5rem;
         }
 
-        /* NEW: Utility class to make the chart span the whole bottom row */
-        .col-span-full {
-            grid-column: 1 / -1;
-        }
-
-        /* NEW: Container to keep Chart.js perfectly responsive */
         .chart-container {
             position: relative;
-            height: 250px;
+            height: 200px;
             width: 100%;
             margin-top: 1rem;
         }
 
-        /* --- Premium Cards --- */
         .card {
             background-color: var(--surface);
             padding: 2rem;
@@ -218,18 +235,8 @@
             align-items: center;
         }
 
-        /* --- KPIs (Gradient Text) --- */
-        .kpi-container {
-            display: flex;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .kpi-card {
-            flex: 1;
-            text-align: left;
-        }
-
+        .kpi-container { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .kpi-card { flex: 1; text-align: left; }
         .kpi-value {
             font-size: 3.5rem;
             font-weight: 800;
@@ -240,160 +247,39 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* --- Forms & Inputs --- */
-        .form-group {
-            margin-bottom: 1.2rem;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
+        .form-group { margin-bottom: 1.2rem; display: flex; flex-direction: column; min-width: 0; }
+        label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 500; }
+        input, select { background-color: #09090b; border: var(--border-subtle); color: var(--text-light); padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem; transition: var(--transition-smooth); width: 100%; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2); }
 
-        label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 0.4rem;
-            font-weight: 500;
-        }
+        button { background-color: var(--text-light); color: #09090b; border: none; padding: 0.8rem; width: 100%; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: var(--transition-smooth); margin-top: 0.5rem; }
+        button:hover { background-color: #e4e4e7; transform: scale(0.98); }
+        button[type="submit"] { background-color: var(--primary); color: #fff; }
+        button[type="submit"]:hover { background-color: var(--primary-hover); }
 
-        input, select {
-            background-color: var(--bg-dark);
-            border: var(--border-subtle);
-            color: var(--text-light);
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: var(--transition-smooth);
-            width: 100%;
-        }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        th, td { padding: 1rem 0.5rem; text-align: left; border-bottom: var(--border-subtle); font-size: 0.9rem; }
+        th { color: var(--text-muted); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
-        }
+        .btn-delete { background-color: transparent; color: var(--text-muted); border: 1px solid transparent; padding: 0.3rem 0.6rem; width: auto; border-radius: 6px; }
+        .btn-delete:hover { background-color: rgba(244, 63, 94, 0.1); color: var(--danger); border-color: rgba(244, 63, 94, 0.2); transform: none; }
 
-        /* --- Buttons --- */
-        button {
-            background-color: var(--text-light);
-            color: var(--bg-dark);
-            border: none;
-            padding: 0.8rem;
-            width: 100%;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            margin-top: 0.5rem;
-        }
+        .filter-btns { display: flex; gap: 0.5rem; background: #09090b; padding: 0.3rem; border-radius: 8px; border: var(--border-subtle); }
+        .btn-mini { padding: 0.4rem 0.8rem; font-size: 0.75rem; width: auto; background: transparent; color: var(--text-muted); border: none; margin-top: 0; border-radius: 6px; }
+        .btn-mini.active { background: var(--surface-hover); color: var(--text-light); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-        button:hover {
-            background-color: #e4e4e7;
-            transform: scale(0.98);
-        }
-
-        button[type="submit"] {
-            background-color: var(--primary);
-            color: #fff;
-        }
-
-        button[type="submit"]:hover {
-            background-color: var(--primary-hover);
-        }
-
-        /* --- Tables --- */
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        th, td {
-            padding: 1rem 0.5rem;
-            text-align: left;
-            border-bottom: var(--border-subtle);
-            font-size: 0.9rem;
-        }
-
-        th {
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-delete {
-            background-color: transparent;
-            color: var(--text-muted);
-            border: 1px solid transparent;
-            padding: 0.3rem 0.6rem;
-            width: auto;
-            border-radius: 6px;
-        }
-
-        .btn-delete:hover {
-            background-color: rgba(244, 63, 94, 0.1);
-            color: var(--danger);
-            border-color: rgba(244, 63, 94, 0.2);
-            transform: none;
-        }
-
-        .filter-btns {
-            display: flex;
-            gap: 0.5rem;
-            background: var(--bg-dark);
-            padding: 0.3rem;
-            border-radius: 8px;
-            border: var(--border-subtle);
-        }
-
-        .btn-mini {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.75rem;
-            width: auto;
-            background: transparent;
-            color: var(--text-muted);
-            border: none;
-            margin-top: 0;
-            border-radius: 6px;
-        }
-
-        .btn-mini.active {
-            background: var(--surface-hover);
-            color: var(--text-light);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        /* --- Routine Builder Specific Styles --- */
-        .builder-day { background: var(--bg-dark); border: var(--border-subtle); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+        .builder-day { background: #09090b; border: var(--border-subtle); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
         .builder-day h3 { margin-top: 0; font-size: 1rem; color: var(--primary); display: flex; justify-content: space-between; }
         .builder-exercise { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
         .routine-item { border-left: 2px solid var(--primary); padding-left: 1rem; margin-bottom: 1rem; }
 
-        /* --- Premium Custom Scrollbar --- */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.2); }
 
-        /* --- TOAST NOTIFICATIONS CSS --- */
-        .toast-container {
-            position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column;
-            gap: 0.8rem; z-index: 9999; pointer-events: none;
-        }
-        
-        .toast {
-            background: rgba(24, 24, 27, 0.75); 
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-light);
-            padding: 0.8rem 1.5rem; border-radius: 50px; font-size: 0.9rem; font-weight: 500;
-            display: flex; align-items: center; gap: 0.6rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            pointer-events: auto;
-        }
-
+        .toast-container { position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 0.8rem; z-index: 9999; pointer-events: none; }
+        .toast { background: rgba(24, 24, 27, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-light); padding: 0.8rem 1.5rem; border-radius: 50px; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 0.6rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; pointer-events: auto; }
         .toast.success::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
         .toast.error::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 8px rgba(244, 63, 94, 0.6); }
         .toast.error { border-color: rgba(244, 63, 94, 0.2); }
@@ -421,6 +307,12 @@
                 <span>Goal: <strong id="displayGoal">---</strong></span>
                 <span>BMR: <strong id="displayBMR">---</strong></span>
                 <span>Target: <strong id="displayTarget" style="color: var(--primary);">---</strong></span>
+                <span>BMI: 
+                    <strong class="tooltip-container" style="color: var(--primary);">
+                        <span id="displayBMIVal">---</span>
+                        <span class="tooltip-text" id="bmiTooltip">No Data</span>
+                    </strong>
+                </span>
             </div>
             <div class="user-controls">
                 <select id="userSelector"></select>
@@ -428,20 +320,21 @@
         </div>
 
         <section id="overview" class="view-section active">
-            <div class="kpi-container">
-                <div class="card kpi-card animate-in" style="animation-delay: 0.2s;">
+            <div class="dashboard-grid animate-in" style="animation-delay: 0.2s;">
+                
+                <div class="card kpi-card">
                     <h2 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Daily Balance</h2>
                     <div id="netDeficitDisplay" class="kpi-value">0 kcal</div>
                     <small id="netStatusLabel" style="color: var(--text-muted); font-weight: 500;">Budget Remaining</small>
                 </div>
-                <div class="card kpi-card animate-in" style="animation-delay: 0.3s;">
-                    <h2 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Body Metrics</h2>
-                    <div id="bmiDisplay" class="kpi-value" style="background: var(--text-light); -webkit-background-clip: text;">---</div>
-                    <small style="color: var(--text-muted); font-weight: 500;">Current BMI</small>
+                
+                <div class="card">
+                    <h2>Weight Timeline</h2>
+                    <div class="chart-container">
+                        <canvas id="weightChart"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <div class="dashboard-grid animate-in" style="animation-delay: 0.4s;">
                 <div class="card">
                     <h2 id="routineWidgetTitle">Today's Mission</h2>
                     <div id="routineWidget" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
@@ -456,12 +349,6 @@
                     </div>
                 </div>
 
-                <div class="card col-span-full">
-                    <h2>Weight Timeline</h2>
-                    <div class="chart-container" style="height: 300px;">
-                        <canvas id="weightChart"></canvas>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -534,6 +421,7 @@
 
         <section id="workouts" class="view-section">
             <div class="dashboard-grid">
+                
                 <div class="card animate-in">
                     <h2>Log Manual Activity</h2>
                     <form id="workoutForm">
@@ -542,8 +430,10 @@
                             <input type="date" id="workoutDate" required>
                         </div>
                         <div class="form-group">
-                            <label>Category</label>
-                            <input type="text" id="workoutCategory" placeholder="e.g., Push Day or LISS" required>
+                            <label>Category / Day</label>
+                            <select id="workoutCategory" required>
+                                <option value="Rest Day">Rest Day</option>
+                            </select>
                         </div>
                         <div style="display: flex; gap: 1rem;">
                             <div class="form-group" style="flex: 1;">
@@ -668,24 +558,19 @@
     </main>
 
     <script>
-        // --- TOAST NOTIFICATION ENGINE ---
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             if (!container) return;
-
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.innerText = message;
-
             container.appendChild(toast);
-
             setTimeout(() => {
                 toast.style.animation = 'fadeOutToast 0.3s forwards';
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        // --- GLOBAL VARIABLES & INIT ---
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('mealDate').value = today;
         document.getElementById('workoutDate').value = today;
@@ -694,7 +579,6 @@
         let currentUserId = localStorage.getItem('selectedUserId');
         if (currentUserId === "null" || currentUserId === "undefined" || currentUserId === "") currentUserId = null;
 
-        // UPDATED: Added macros to daily totals
         let userStats = { bmr: 0, target: 0, goal: 'Maintain', current: {} };
         let dailyTotals = { consumed: 0, burned: 0, pro: 0, carb: 0, fat: 0 };
         
@@ -702,11 +586,8 @@
         let routineDayCount = 0; 
         let customRecipes = [];
 
-        // Chart Instance Pointers
         let macroChartInstance = null;
         let weightChartInstance = null;
-
-        // Set global Chart.js defaults to match our SaaS dark theme
         Chart.defaults.color = '#a1a1aa';
         Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
@@ -716,37 +597,30 @@
             'full_body': { name: "Full Body Foundation", days: [ { name: "Full Body A", exercises: [ { name: "Barbell Squat", sets: 3, reps: "8-10" }, { name: "Barbell Bench Press", sets: 3, reps: "8-10" }, { name: "Barbell Row", sets: 3, reps: "8-10" }, { name: "Overhead Press", sets: 3, reps: "10-12" } ]} ] }
         };
 
-        // --- CORE UI LOGIC ---
         function switchView(viewId, el) {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            
             const activeView = document.getElementById(viewId); 
             activeView.classList.add('active');
-            
             const cards = activeView.querySelectorAll('.animate-in'); 
-            cards.forEach(card => { 
-                card.style.animation = 'none'; 
-                card.offsetHeight; 
-                card.style.animation = null; 
-            });
+            cards.forEach(card => { card.style.animation = 'none'; card.offsetHeight; card.style.animation = null; });
             el.classList.add('active');
         }
 
+        // UPDATED: Corrected Calorie Logic
         function updateNetDeficit() {
-            const net = dailyTotals.consumed - dailyTotals.burned;
-            const status = net - userStats.target;
+            const remaining = userStats.target - dailyTotals.consumed + dailyTotals.burned;
             const display = document.getElementById('netDeficitDisplay');
             const label = document.getElementById('netStatusLabel');
             
-            display.innerText = `${Math.abs(status)} kcal`;
-            if (status <= 0) {
+            display.innerText = `${Math.abs(remaining)} kcal`;
+            if (remaining >= 0) {
                 display.style.background = 'none'; 
-                display.style.webkitTextFillColor = 'var(--success)'; 
+                display.style.webkitTextFillColor = 'var(--success)';
                 label.innerText = 'Budget Remaining';
             } else {
                 display.style.background = 'none'; 
-                display.style.webkitTextFillColor = 'var(--danger)'; 
+                display.style.webkitTextFillColor = 'var(--danger)';
                 label.innerText = 'Over Daily Target';
             }
         }
@@ -769,15 +643,12 @@
             .then(res => res.json())
             .then(data => {
                 if(data.status !== "success") return;
-                
                 const selector = document.getElementById('userSelector'); 
                 selector.innerHTML = '';
-                
                 if (data.data.length > 0 && !currentUserId) { 
                     currentUserId = data.data[0].UserID; 
                     localStorage.setItem('selectedUserId', currentUserId); 
                 }
-                
                 data.data.forEach(u => { 
                     const opt = document.createElement('option'); 
                     opt.value = u.UserID; 
@@ -785,7 +656,6 @@
                     if (u.UserID == currentUserId) opt.selected = true; 
                     selector.appendChild(opt); 
                 });
-                
                 loadDashboardData();
             });
         }
@@ -804,50 +674,29 @@
             switchView('profile', document.querySelector('.nav-link:nth-child(4)')); 
         });
 
-        // --- NEW: CHART RENDERING LOGIC ---
         function renderMacroChart() {
             const ctx = document.getElementById('macroChart').getContext('2d');
-            
-            if (macroChartInstance) {
-                macroChartInstance.destroy();
-            }
+            if (macroChartInstance) macroChartInstance.destroy();
 
-            // Fallback so it doesn't look broken if they have 0 logs today
             let dataArr = [dailyTotals.pro, dailyTotals.carb, dailyTotals.fat];
             let colors = ['#14b8a6', '#a1a1aa', '#f43f5e'];
             
             if (dailyTotals.pro === 0 && dailyTotals.carb === 0 && dailyTotals.fat === 0) {
                 dataArr = [1];
-                colors = ['#27272a']; // Empty grey ring
+                colors = ['#27272a']; 
             }
 
             macroChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: dataArr.length === 1 ? ['No Data'] : ['Protein (g)', 'Carbs (g)', 'Fats (g)'],
-                    datasets: [{
-                        data: dataArr,
-                        backgroundColor: colors,
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
+                    datasets: [{ data: dataArr, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '75%', // Makes the ring thin and premium
+                    responsive: true, maintainAspectRatio: false, cutout: '75%',
                     plugins: {
-                        legend: { 
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                boxWidth: 8
-                            }
-                        },
-                        tooltip: {
-                            enabled: dataArr.length > 1
-                        }
+                        legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, boxWidth: 8 } },
+                        tooltip: { enabled: dataArr.length > 1 }
                     }
                 }
             });
@@ -855,87 +704,52 @@
 
         function renderWeightChart(dates, weights) {
             const ctx = document.getElementById('weightChart').getContext('2d');
-            
-            if (weightChartInstance) {
-                weightChartInstance.destroy();
-            }
+            if (weightChartInstance) weightChartInstance.destroy();
 
             weightChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: dates,
                     datasets: [{
-                        label: 'Weight (kg)',
-                        data: weights,
-                        borderColor: '#14b8a6',
-                        backgroundColor: 'rgba(20, 184, 166, 0.1)', // Subtle teal glow
-                        borderWidth: 3,
-                        pointBackgroundColor: '#18181b',
-                        pointBorderColor: '#14b8a6',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        fill: true,
-                        tension: 0.4 // Gives it that smooth, sweeping curve
+                        label: 'Weight (kg)', data: weights, borderColor: '#14b8a6', backgroundColor: 'rgba(20, 184, 166, 0.1)', 
+                        borderWidth: 3, pointBackgroundColor: '#18181b', pointBorderColor: '#14b8a6', pointBorderWidth: 2, 
+                        pointRadius: 4, pointHoverRadius: 6, fill: true, tension: 0.4 
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
                     scales: {
-                        x: {
-                            grid: { display: false, drawBorder: false }
-                        },
-                        y: {
-                            grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
-                            beginAtZero: false
-                        }
+                        x: { grid: { display: false, drawBorder: false } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false }, beginAtZero: false }
                     }
                 }
             });
         }
 
-        // --- ROUTINE BUILDER ---
         function fetchMasterExercises() { 
-            fetch('/api/get_exercises')
-            .then(res => res.json())
-            .then(data => { if(data.status === "success") masterExercises = data.data; }); 
+            fetch('/api/get_exercises').then(res => res.json()).then(data => { if(data.status === "success") masterExercises = data.data; }); 
         }
 
         function addRoutineDay(defaultName = '') {
-            routineDayCount++; 
-            const dayId = routineDayCount;
+            routineDayCount++; const dayId = routineDayCount;
             const container = document.getElementById('routineDaysContainer');
-            const dayDiv = document.createElement('div'); 
-            
-            dayDiv.className = 'builder-day'; 
-            dayDiv.id = `builder-day-${dayId}`;
+            const dayDiv = document.createElement('div'); dayDiv.className = 'builder-day'; dayDiv.id = `builder-day-${dayId}`;
             
             dayDiv.innerHTML = `
                 <h3>Day ${dayId} <button type="button" class="btn-delete" onclick="this.parentElement.parentElement.remove()">X</button></h3>
                 <input type="text" class="day-name-input" placeholder="e.g., Push Day" value="${defaultName}" required style="width: 100%; margin-bottom: 0.5rem;">
                 <div id="exercises-for-day-${dayId}"></div>
-                <button type="button" onclick="addExerciseToDay(${dayId})" style="background: var(--bg-dark); color: var(--text-light); font-size: 0.8rem; padding: 0.4rem;">+ Add Exercise</button>
+                <button type="button" onclick="addExerciseToDay(${dayId})" style="background: #09090b; color: var(--text-light); font-size: 0.8rem; padding: 0.4rem;">+ Add Exercise</button>
             `;
-            
             container.appendChild(dayDiv); 
-            
-            if (!defaultName) {
-                addExerciseToDay(dayId);
-            }
+            if (!defaultName) addExerciseToDay(dayId);
             return dayId;
         }
 
         function addExerciseToDay(dayId, exName = '', sets = '', reps = '') {
             const exContainer = document.getElementById(`exercises-for-day-${dayId}`);
-            const exDiv = document.createElement('div'); 
-            exDiv.className = 'builder-exercise';
-            
-            let options = '<option value="">Select Movement...</option>'; 
-            let targetExId = '';
+            const exDiv = document.createElement('div'); exDiv.className = 'builder-exercise';
+            let options = '<option value="">Select Movement...</option>'; let targetExId = '';
             
             masterExercises.forEach(ex => { 
                 options += `<option value="${ex.ExerciseID}">${ex.Name} (${ex.MuscleGroup})</option>`; 
@@ -948,434 +762,217 @@
                 <input type="text" class="ex-reps" placeholder="Reps" value="${reps}" required style="flex: 1; padding: 0.5rem;">
                 <button type="button" class="btn-delete" style="padding: 0.5rem;" onclick="this.parentElement.remove()">X</button>
             `;
-            
             exContainer.appendChild(exDiv); 
-            
-            if (targetExId) {
-                exContainer.lastElementChild.querySelector('.ex-id').value = targetExId;
-            }
+            if (targetExId) exContainer.lastElementChild.querySelector('.ex-id').value = targetExId;
         }
 
         document.getElementById('routineTemplateSelector').addEventListener('change', function(e) {
-            const val = e.target.value; 
-            const container = document.getElementById('routineDaysContainer'); 
-            const nameInput = document.getElementById('routineName');
-            
-            container.innerHTML = ''; 
-            routineDayCount = 0;
-            
-            if (val === 'custom') { 
-                nameInput.value = ''; 
-                addRoutineDay(); 
-                return; 
-            }
-            
-            const tpl = routineTemplates[val]; 
-            nameInput.value = tpl.name;
-            
-            tpl.days.forEach(day => { 
-                const dayId = addRoutineDay(day.name); 
-                day.exercises.forEach(ex => { 
-                    addExerciseToDay(dayId, ex.name, ex.sets, ex.reps); 
-                }); 
-            });
-            
+            const val = e.target.value; const container = document.getElementById('routineDaysContainer'); const nameInput = document.getElementById('routineName');
+            container.innerHTML = ''; routineDayCount = 0;
+            if (val === 'custom') { nameInput.value = ''; addRoutineDay(); return; }
+            const tpl = routineTemplates[val]; nameInput.value = tpl.name;
+            tpl.days.forEach(day => { const dayId = addRoutineDay(day.name); day.exercises.forEach(ex => { addExerciseToDay(dayId, ex.name, ex.sets, ex.reps); }); });
             showToast("Template loaded");
         });
 
         document.getElementById('routineBuilderForm').addEventListener('submit', function(e) {
             e.preventDefault(); 
-            
             if (!currentUserId) return showToast("Select a profile first", "error");
             
-            const routineName = document.getElementById('routineName').value; 
-            const days = [];
+            const routineName = document.getElementById('routineName').value; const days = [];
             const dayElements = document.querySelectorAll('.builder-day');
-            
             if(dayElements.length === 0) return showToast("Please add at least one Day to your routine.", "error");
 
             dayElements.forEach(dayEl => {
-                const dayName = dayEl.querySelector('.day-name-input').value; 
-                const exercises = [];
-                
+                const dayName = dayEl.querySelector('.day-name-input').value; const exercises = [];
                 dayEl.querySelectorAll('.builder-exercise').forEach(exEl => { 
-                    exercises.push({ 
-                        exercise_id: parseInt(exEl.querySelector('.ex-id').value), 
-                        sets: parseInt(exEl.querySelector('.ex-sets').value), 
-                        reps: exEl.querySelector('.ex-reps').value 
-                    }); 
+                    exercises.push({ exercise_id: parseInt(exEl.querySelector('.ex-id').value), sets: parseInt(exEl.querySelector('.ex-sets').value), reps: exEl.querySelector('.ex-reps').value }); 
                 });
-                
-                if(exercises.length > 0) {
-                    days.push({ day_name: dayName, exercises: exercises });
-                }
+                if(exercises.length > 0) days.push({ day_name: dayName, exercises: exercises });
             });
             
-            const payload = { user_id: currentUserId, routine_name: routineName, days: days };
-
-            fetch('/api/add_routine', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(payload) 
-            })
-            .then(res => res.json())
-            .then(data => {
+            fetch('/api/add_routine', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, routine_name: routineName, days: days }) })
+            .then(res => res.json()).then(data => {
                 if(data.status === "success") { 
-                    showToast("Protocol activated!"); 
-                    this.reset(); 
-                    document.getElementById('routineDaysContainer').innerHTML = ''; 
-                    routineDayCount = 0; 
-                    document.getElementById('routineTemplateSelector').value = 'custom'; 
-                    loadDashboardWidget(); 
-                } else {
-                    showToast(data.message, "error");
-                }
+                    showToast("Protocol activated!"); this.reset(); document.getElementById('routineDaysContainer').innerHTML = ''; routineDayCount = 0; 
+                    document.getElementById('routineTemplateSelector').value = 'custom'; loadDashboardWidget(); 
+                } else showToast(data.message, "error");
             });
         });
 
+        // UPDATED: Dynamically populate workout category dropdown based on active routine
         function loadDashboardWidget() {
             if (!currentUserId) return; 
+            const widget = document.getElementById('routineWidget'); const title = document.getElementById('routineWidgetTitle');
+            const workoutCatSelect = document.getElementById('workoutCategory');
             
-            const widget = document.getElementById('routineWidget'); 
-            const title = document.getElementById('routineWidgetTitle');
-            
-            fetch(`/api/get_active_routine?user_id=${currentUserId}`)
-            .then(res => res.json())
-            .then(data => {
+            workoutCatSelect.innerHTML = '<option value="Rest Day">Rest Day</option>'; // Always allow rest
+
+            fetch(`/api/get_active_routine?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if(data.status === "success" && data.data) {
-                    const r = data.data; 
-                    title.innerText = `Active Protocol: ${r.RoutineName}`;
-                    
+                    const r = data.data; title.innerText = `Active Protocol: ${r.RoutineName}`;
                     if (r.days && r.days.length > 0) {
+                        
+                        r.days.forEach(day => {
+                            workoutCatSelect.innerHTML += `<option value="${day.DayName}">${day.DayName}</option>`;
+                        });
+
                         const todaySplit = r.days[0]; 
                         let html = `<h3 style="color: var(--text-light); margin-top: 0;">${todaySplit.DayName}</h3>`;
-                        
-                        todaySplit.exercises.forEach(ex => { 
-                            html += `<div class="routine-item"><strong style="color: var(--text-light);">${ex.ExerciseName}</strong><br>${ex.TargetSets} Sets x ${ex.TargetReps} Reps <span style="font-size: 0.8rem; color: var(--primary);">[${ex.MuscleGroup}]</span></div>`; 
-                        });
-                        
+                        todaySplit.exercises.forEach(ex => { html += `<div class="routine-item"><strong style="color: var(--text-light);">${ex.ExerciseName}</strong><br>${ex.TargetSets} Sets x ${ex.TargetReps} Reps <span style="font-size: 0.8rem; color: var(--primary);">[${ex.MuscleGroup}]</span></div>`; });
                         html += `<button onclick="switchView('workouts', document.querySelector('.nav-link:nth-child(3)'))" style="background: rgba(255,255,255,0.05); color: var(--primary); border: 1px solid var(--primary);">Go to Tracker</button>`;
                         widget.innerHTML = html;
                     }
                 } else { 
                     title.innerText = "Today's Mission"; 
                     widget.innerHTML = "<p>No active routine detected. Head to the Training tab to log a session or build a new protocol.</p>"; 
+                    workoutCatSelect.innerHTML += '<option value="Manual Log">Manual Log</option>';
                 }
             });
         }
 
-        // --- RECIPE ENGINE ---
         function loadRecipes() {
             if (!currentUserId) return;
-            
-            fetch(`/api/get_recipes?user_id=${currentUserId}`)
-            .then(res => res.json())
-            .then(data => {
+            fetch(`/api/get_recipes?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if (data.status === "success") {
-                    customRecipes = data.data; 
-                    const selector = document.getElementById('savedRecipeSelector');
+                    customRecipes = data.data; const selector = document.getElementById('savedRecipeSelector');
                     selector.innerHTML = '<option value="">Select a saved meal...</option>';
-                    
-                    customRecipes.forEach(r => { 
-                        selector.innerHTML += `<option value="${r.RecipeID}">${r.RecipeName} (${r.Calories} kcal)</option>`; 
-                    });
+                    customRecipes.forEach(r => { selector.innerHTML += `<option value="${r.RecipeID}">${r.RecipeName} (${r.Calories} kcal)</option>`; });
                 }
             });
         }
 
         document.getElementById('savedRecipeSelector').addEventListener('change', function(e) {
-            const recipeId = parseInt(e.target.value); 
-            if (!recipeId) return;
-            
+            const recipeId = parseInt(e.target.value); if (!recipeId) return;
             const recipe = customRecipes.find(r => r.RecipeID === recipeId);
-            
             if (recipe) {
-                document.getElementById('foodItem').value = recipe.RecipeName; 
-                document.getElementById('mealCals').value = recipe.Calories; 
-                document.getElementById('mealProtein').value = recipe.ProteinGrams; 
-                document.getElementById('mealCarbs').value = recipe.CarbsGrams; 
-                document.getElementById('mealFats').value = recipe.FatsGrams;
-                showToast("Recipe loaded");
+                document.getElementById('foodItem').value = recipe.RecipeName; document.getElementById('mealCals').value = recipe.Calories; 
+                document.getElementById('mealProtein').value = recipe.ProteinGrams; document.getElementById('mealCarbs').value = recipe.CarbsGrams; 
+                document.getElementById('mealFats').value = recipe.FatsGrams; showToast("Recipe loaded");
             }
         });
 
         document.getElementById('btnSaveAsRecipe').addEventListener('click', function() {
             if (!currentUserId) return showToast("Select a profile first", "error");
-            
-            const name = document.getElementById('foodItem').value; 
-            const cals = document.getElementById('mealCals').value;
-            
+            const name = document.getElementById('foodItem').value; const cals = document.getElementById('mealCals').value;
             if (!name || !cals) return showToast("Food Item and Calories required", "error");
 
-            const payload = { 
-                user_id: currentUserId, 
-                recipe_name: name, 
-                calories: parseInt(cals), 
-                protein: parseInt(document.getElementById('mealProtein').value || 0), 
-                carbs: parseInt(document.getElementById('mealCarbs').value || 0), 
-                fats: parseInt(document.getElementById('mealFats').value || 0) 
-            };
-            
-            fetch('/api/add_recipe', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(payload) 
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "success") { 
-                    showToast(`${name} added to library`); 
-                    loadRecipes(); 
-                } else {
-                    showToast(data.message, "error");
-                }
+            const payload = { user_id: currentUserId, recipe_name: name, calories: parseInt(cals), protein: parseInt(document.getElementById('mealProtein').value || 0), carbs: parseInt(document.getElementById('mealCarbs').value || 0), fats: parseInt(document.getElementById('mealFats').value || 0) };
+            fetch('/api/add_recipe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(res => res.json()).then(data => {
+                if (data.status === "success") { showToast(`${name} added to library`); loadRecipes(); } else showToast(data.message, "error");
             });
         });
 
-        // --- STANDARD LOGGING FORMS ---
         document.getElementById('weightForm').addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            const val = document.getElementById('logWeightVal').value || document.getElementById('logWeightVal').placeholder;
-            
-            fetch('/api/add_weight', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ user_id: currentUserId, date: document.getElementById('weightDate').value, weight: parseFloat(val) }) 
-            })
-            .then(res => res.json())
-            .then(data => { 
-                if(data.status === "success") { 
-                    showToast("Weight logged"); 
-                    e.target.reset(); 
-                    document.getElementById('weightDate').value = today; 
-                    loadDashboardData(); 
-                } 
+            e.preventDefault(); const val = document.getElementById('logWeightVal').value || document.getElementById('logWeightVal').placeholder;
+            fetch('/api/add_weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, date: document.getElementById('weightDate').value, weight: parseFloat(val) }) }).then(res => res.json()).then(data => { 
+                if(data.status === "success") { showToast("Weight logged"); e.target.reset(); document.getElementById('weightDate').value = today; loadDashboardData(); } 
             });
         });
 
         function loadWeightHistory() {
             if (!currentUserId) return;
-            
-            fetch(`/api/get_weight?user_id=${currentUserId}`)
-            .then(res => res.json())
-            .then(data => {
+            fetch(`/api/get_weight?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if(data.status === "success") {
-                    // Extract data for the Chart.js line graph (reverse array to show oldest -> newest chronologically)
                     const dates = data.data.map(w => w.LogDate).reverse();
                     const weights = data.data.map(w => w.WeightKG).reverse();
-                    
-                    // Render the chart
                     renderWeightChart(dates, weights);
                 }
             });
         }
 
         document.getElementById('profileForm').addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            const getVal = (id) => document.getElementById(id).value || document.getElementById(id).placeholder;
-            
-            const payload = { 
-                user_id: currentUserId, 
-                username: getVal('username'), 
-                age: parseInt(getVal('userAge')), 
-                weight: parseFloat(getVal('userWeight')), 
-                height: parseFloat(getVal('userHeight')), 
-                gender: document.getElementById('userGender').value, 
-                goal: document.getElementById('userGoal').value, 
-                manualTarget: document.getElementById('manualTarget').value 
-            };
-            
+            e.preventDefault(); const getVal = (id) => document.getElementById(id).value || document.getElementById(id).placeholder;
+            const payload = { user_id: currentUserId, username: getVal('username'), age: parseInt(getVal('userAge')), weight: parseFloat(getVal('userWeight')), height: parseFloat(getVal('userHeight')), gender: document.getElementById('userGender').value, goal: document.getElementById('userGoal').value, manualTarget: document.getElementById('manualTarget').value };
             let bmr = Math.round((10 * payload.weight) + (6.25 * payload.height) - (5 * payload.age) + (payload.gender === 'M' ? 5 : -161));
-            payload.bmr = bmr; 
-            payload.target_calories = payload.manualTarget ? parseInt(payload.manualTarget) : Math.round(bmr * 1.2 + (payload.goal === 'Cut' ? -500 : payload.goal === 'Bulk' ? 500 : 0));
-            
-            fetch('/api/add_user', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(payload) 
-            })
-            .then(res => res.json())
-            .then(data => { 
-                if(data.status === "success") { 
-                    showToast("Profile Synced"); 
-                    loadUserList(); 
-                } else { 
-                    showToast("Database Error", "error"); 
-                }
+            payload.bmr = bmr; payload.target_calories = payload.manualTarget ? parseInt(payload.manualTarget) : Math.round(bmr * 1.2 + (payload.goal === 'Cut' ? -500 : payload.goal === 'Bulk' ? 500 : 0));
+            fetch('/api/add_user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(res => res.json()).then(data => { 
+                if(data.status === "success") { showToast("Profile Synced"); loadUserList(); } else { showToast("Database Error", "error"); }
             });
         });
 
         document.getElementById('mealForm').addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            const payload = { 
-                user_id: currentUserId, 
-                date: document.getElementById('mealDate').value, 
-                food: document.getElementById('foodItem').value, 
-                calories: parseInt(document.getElementById('mealCals').value || 0), 
-                protein: parseInt(document.getElementById('mealProtein').value || 0), 
-                carbs: parseInt(document.getElementById('mealCarbs').value || 0), 
-                fats: parseInt(document.getElementById('mealFats').value || 0) 
-            };
-            
-            fetch('/api/add_meal', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(payload) 
-            })
-            .then(() => { 
-                showToast("Nutrition Logged"); 
-                e.target.reset(); 
-                document.getElementById('mealDate').value = today; 
-                document.getElementById('savedRecipeSelector').value = ""; 
-                loadDashboardData(); 
+            e.preventDefault(); const payload = { user_id: currentUserId, date: document.getElementById('mealDate').value, food: document.getElementById('foodItem').value, calories: parseInt(document.getElementById('mealCals').value || 0), protein: parseInt(document.getElementById('mealProtein').value || 0), carbs: parseInt(document.getElementById('mealCarbs').value || 0), fats: parseInt(document.getElementById('mealFats').value || 0) };
+            fetch('/api/add_meal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(() => { 
+                showToast("Nutrition Logged"); e.target.reset(); document.getElementById('mealDate').value = today; document.getElementById('savedRecipeSelector').value = ""; loadDashboardData(); 
             });
         });
 
         document.getElementById('workoutForm').addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            const payload = { 
-                user_id: currentUserId, 
-                date: document.getElementById('workoutDate').value, 
-                category: document.getElementById('workoutCategory').value, 
-                duration: parseInt(document.getElementById('workoutDuration').value || 0), 
-                calories: parseInt(document.getElementById('workoutCals').value || 0) 
-            };
-            
-            fetch('/api/add_workout', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(payload) 
-            })
-            .then(() => { 
-                showToast("Activity Logged"); 
-                e.target.reset(); 
-                document.getElementById('workoutDate').value = today; 
-                loadDashboardData(); 
+            e.preventDefault(); const payload = { user_id: currentUserId, date: document.getElementById('workoutDate').value, category: document.getElementById('workoutCategory').value, duration: parseInt(document.getElementById('workoutDuration').value || 0), calories: parseInt(document.getElementById('workoutCals').value || 0) };
+            fetch('/api/add_workout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(() => { 
+                showToast("Activity Logged"); e.target.reset(); document.getElementById('workoutDate').value = today; loadDashboardData(); 
             });
         });
 
         function loadMeals(days = null, btn = null) {
-            if (!currentUserId) return; 
-            
-            if (btn) { 
-                btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active')); 
-                btn.classList.add('active'); 
-            }
-            
+            if (!currentUserId) return; if (btn) { btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
             const url = days ? `/api/get_meals?user_id=${currentUserId}&days=${days}` : `/api/get_meals?user_id=${currentUserId}`;
-            
-            fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                const tbody = document.getElementById('mealTableBody'); 
-                tbody.innerHTML = ''; 
-                
-                // Reset daily tracking
-                if (!days) {
-                    dailyTotals.consumed = 0;
-                    dailyTotals.pro = 0;
-                    dailyTotals.carb = 0;
-                    dailyTotals.fat = 0;
-                }
-                
+            fetch(url).then(res => res.json()).then(data => {
+                const tbody = document.getElementById('mealTableBody'); tbody.innerHTML = ''; 
+                if (!days) { dailyTotals.consumed = 0; dailyTotals.pro = 0; dailyTotals.carb = 0; dailyTotals.fat = 0; }
                 if(data.status === "success" && data.data) {
                     data.data.forEach(m => { 
-                        // Only add to today's macros if we are looking at the "Latest" view and it matches today's date
-                        if (!days && m.LogDate === today) {
-                            dailyTotals.consumed += m.Calories;
-                            dailyTotals.pro += m.ProteinGrams;
-                            dailyTotals.carb += m.CarbsGrams;
-                            dailyTotals.fat += m.FatsGrams;
-                        } 
-                        
+                        if (!days && m.LogDate === today) { dailyTotals.consumed += m.Calories; dailyTotals.pro += m.ProteinGrams; dailyTotals.carb += m.CarbsGrams; dailyTotals.fat += m.FatsGrams; } 
                         tbody.innerHTML += `<tr><td>${m.LogDate}</td><td style="font-weight: 500;">${m.FoodItem}</td><td>${m.Calories}</td><td><span style="color: var(--text-muted);">${m.ProteinGrams}p / ${m.CarbsGrams}c / ${m.FatsGrams}f</span></td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">Delete</button></td></tr>`; 
                     });
                 } 
-                
-                updateNetDeficit();
-                renderMacroChart(); // Triggers the visualizer to redraw
+                updateNetDeficit(); renderMacroChart();
             });
         }
 
         function loadWorkouts(days = null, btn = null) {
-            if (!currentUserId) return; 
-            
-            if (btn) { 
-                btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active')); 
-                btn.classList.add('active'); 
-            }
-            
+            if (!currentUserId) return; if (btn) { btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
             const url = days ? `/api/get_workouts?user_id=${currentUserId}&days=${days}` : `/api/get_workouts?user_id=${currentUserId}`;
-            
-            fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                const tbody = document.getElementById('workoutTableBody'); 
-                tbody.innerHTML = ''; 
-                
-                if (!days) dailyTotals.burned = 0;
-                
+            fetch(url).then(res => res.json()).then(data => {
+                const tbody = document.getElementById('workoutTableBody'); tbody.innerHTML = ''; if (!days) dailyTotals.burned = 0;
                 if(data.status === "success" && data.data) {
                     data.data.forEach(w => { 
                         if (!days && w.LogDate === today) dailyTotals.burned += w.CaloriesBurned; 
                         tbody.innerHTML += `<tr><td>${w.LogDate}</td><td style="font-weight: 500;">${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">Delete</button></td></tr>`; 
                     });
                 } 
-                
                 updateNetDeficit();
             });
         }
 
+        // UPDATED: Calculates BMI and status, applies to hover tooltip in header
         function loadDashboardData() {
             if (!currentUserId) { 
-                ['displayGoal', 'displayBMR', 'displayTarget', 'bmiDisplay'].forEach(id => document.getElementById(id).innerText = "---"); 
+                ['displayGoal', 'displayBMR', 'displayTarget', 'displayBMIVal'].forEach(id => document.getElementById(id).innerText = "---"); 
+                document.getElementById('bmiTooltip').innerText = "No Data";
                 return; 
             }
             
-            fetch(`/api/get_user?user_id=${currentUserId}`)
-            .then(res => res.json())
-            .then(data => {
+            fetch(`/api/get_user?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if(data.status === "success") {
-                    const u = data.data; 
-                    userStats.bmr = u.CalculatedBMR; 
-                    userStats.target = u.TargetCalories; 
-                    userStats.goal = u.FitnessGoal;
-                    
+                    const u = data.data; userStats.bmr = u.CalculatedBMR; userStats.target = u.TargetCalories; userStats.goal = u.FitnessGoal;
                     document.getElementById('displayGoal').innerText = u.FitnessGoal || "---"; 
                     document.getElementById('displayBMR').innerText = (u.CalculatedBMR || 0) + " kcal"; 
                     document.getElementById('displayTarget').innerText = (u.TargetCalories || 0) + " kcal";
-                    
-                    document.getElementById('username').placeholder = u.Username || "--"; 
-                    document.getElementById('userAge').placeholder = u.Age || "--"; 
-                    document.getElementById('userWeight').placeholder = u.WeightKG || "--"; 
-                    document.getElementById('userHeight').placeholder = u.HeightCM || "--"; 
-                    document.getElementById('userGender').value = u.Gender || "M"; 
-                    document.getElementById('userGoal').value = u.FitnessGoal || "Maintain"; 
-                    document.getElementById('logWeightVal').placeholder = u.WeightKG || "--";
+                    document.getElementById('username').placeholder = u.Username || "--"; document.getElementById('userAge').placeholder = u.Age || "--"; document.getElementById('userWeight').placeholder = u.WeightKG || "--"; document.getElementById('userHeight').placeholder = u.HeightCM || "--"; document.getElementById('userGender').value = u.Gender || "M"; document.getElementById('userGoal').value = u.FitnessGoal || "Maintain"; document.getElementById('logWeightVal').placeholder = u.WeightKG || "--";
                     
                     if (u.WeightKG && u.HeightCM) { 
                         const bmi = (u.WeightKG / ((u.HeightCM / 100) ** 2)).toFixed(1); 
-                        document.getElementById('bmiDisplay').innerText = bmi; 
-                        document.getElementById('bmiDisplay').style.background = 'linear-gradient(135deg, #2dd4bf, #0d9488)'; 
-                        document.getElementById('bmiDisplay').style.webkitBackgroundClip = 'text'; 
-                        document.getElementById('bmiDisplay').style.webkitTextFillColor = 'transparent'; 
+                        document.getElementById('displayBMIVal').innerText = bmi; 
+                        
+                        let status = "Normal";
+                        let color = "var(--success)";
+                        if (bmi < 18.5) { status = "Underweight"; color = "var(--text-muted)"; }
+                        else if (bmi >= 25 && bmi < 29.9) { status = "Overweight"; color = "orange"; }
+                        else if (bmi >= 30) { status = "Obese"; color = "var(--danger)"; }
+                        
+                        const tooltip = document.getElementById('bmiTooltip');
+                        tooltip.innerText = status;
+                        tooltip.style.color = color;
                     }
                     
-                    // Fire all data fetches (which will in turn draw the charts)
-                    loadMeals(); 
-                    loadWorkouts(); 
-                    loadWeightHistory(); 
-                    loadDashboardWidget(); 
-                    loadRecipes();
+                    loadMeals(); loadWorkouts(); loadWeightHistory(); loadDashboardWidget(); loadRecipes();
                 }
             });
         }
 
-        // Initialize App
-        window.onload = () => { 
-            fetchMasterExercises(); 
-            loadUserList(); 
-        };
+        window.onload = () => { fetchMasterExercises(); loadUserList(); };
     </script>
 </body>
 </html>
