@@ -121,11 +121,22 @@
             background: linear-gradient(135deg, #2dd4bf, #0d9488); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .form-group { margin-bottom: 1.2rem; display: flex; flex-direction: column; }
+        .form-group { 
+            margin-bottom: 1.2rem; 
+            display: flex; 
+            flex-direction: column; 
+            min-width: 0; /* THE FIX: Allows the group to shrink inside a flexbox */
+        }
         label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 500; }
         input, select {
-            background-color: var(--bg-dark); border: var(--border-subtle); color: var(--text-light);
-            padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem; transition: var(--transition-smooth);
+            background-color: var(--bg-dark); 
+            border: var(--border-subtle); 
+            color: var(--text-light);
+            padding: 0.8rem 1rem; 
+            border-radius: 8px; 
+            font-size: 0.95rem; 
+            transition: var(--transition-smooth);
+            width: 100%; /* THE FIX: Forces inputs to obey container walls */
         }
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2); }
 
