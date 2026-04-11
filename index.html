@@ -9,7 +9,7 @@
 
     <style>
         :root {
-            var(--bg-dark): #09090b; 
+            --bg-dark: #09090b; 
             --surface: #18181b; 
             --surface-hover: #27272a;
             --primary: #14b8a6; 
@@ -144,7 +144,6 @@
             margin-left: 0.3rem;
         }
 
-        /* NEW: Hover Tooltip for BMI */
         .tooltip-container {
             position: relative;
             display: inline-block;
@@ -322,10 +321,15 @@
         <section id="overview" class="view-section active">
             <div class="dashboard-grid animate-in" style="animation-delay: 0.2s;">
                 
-                <div class="card kpi-card">
-                    <h2 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Daily Balance</h2>
-                    <div id="netDeficitDisplay" class="kpi-value">0 kcal</div>
-                    <small id="netStatusLabel" style="color: var(--text-muted); font-weight: 500;">Budget Remaining</small>
+                <div class="card kpi-card" style="display: flex; flex-direction: column;">
+                    <div>
+                        <h2 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Daily Balance</h2>
+                        <div id="netDeficitDisplay" class="kpi-value">0 kcal</div>
+                        <small id="netStatusLabel" style="color: var(--text-muted); font-weight: 500;">Budget Remaining</small>
+                    </div>
+                    <div style="flex: 1; min-height: 80px; position: relative; margin-top: 1rem;">
+                        <canvas id="balanceChart"></canvas>
+                    </div>
                 </div>
                 
                 <div class="card">
@@ -558,6 +562,20 @@
     </main>
 
     <script>
+        // --- NEW: Date Formatting Engine ---
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            // Manually splits the YYYY-MM-DD string to avoid browser timezone shifting issues
+            const [year, month, day] = dateStr.split('-');
+            const dateObj = new Date(year, month - 1, day);
+            return dateObj.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+        }
+
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             if (!container) return;
@@ -588,6 +606,8 @@
 
         let macroChartInstance = null;
         let weightChartInstance = null;
+        let balanceChartInstance = null; // NEW: Pointer for the horizontal balance chart
+
         Chart.defaults.color = '#a1a1aa';
         Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
@@ -607,7 +627,47 @@
             el.classList.add('active');
         }
 
-        // UPDATED: Corrected Calorie Logic
+        // NEW: Handles drawing the horizontal bar chart
+        function renderBalanceChart() {
+            const ctx = document.getElementById('balanceChart').getContext('2d');
+            if (balanceChartInstance) balanceChartInstance.destroy();
+
+            const budget = userStats.target + dailyTotals.burned;
+            const consumed = dailyTotals.consumed;
+            
+            // Turn the consumed bar red if you go over your budget
+            let consumedColor = '#14b8a6'; 
+            if (consumed > budget) consumedColor = '#f43f5e'; 
+
+            balanceChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Intake', 'Budget'],
+                    datasets: [{
+                        data: [consumed, budget],
+                        backgroundColor: [consumedColor, '#27272a'],
+                        borderRadius: 4,
+                        barThickness: 16
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // This is what flips the bar chart sideways!
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: {
+                        x: { display: false, beginAtZero: true },
+                        y: { 
+                            grid: { display: false, drawBorder: false },
+                            ticks: { color: '#a1a1aa', font: { size: 12, weight: '600' } },
+                            border: { display: false }
+                        }
+                    },
+                    layout: { padding: 0 }
+                }
+            });
+        }
+
         function updateNetDeficit() {
             const remaining = userStats.target - dailyTotals.consumed + dailyTotals.burned;
             const display = document.getElementById('netDeficitDisplay');
@@ -623,6 +683,9 @@
                 display.style.webkitTextFillColor = 'var(--danger)';
                 label.innerText = 'Over Daily Target';
             }
+
+            // Draw the new horizontal chart since our numbers are finalized
+            renderBalanceChart();
         }
 
         function deleteEntry(id, type) {
@@ -800,13 +863,12 @@
             });
         });
 
-        // UPDATED: Dynamically populate workout category dropdown based on active routine
         function loadDashboardWidget() {
             if (!currentUserId) return; 
             const widget = document.getElementById('routineWidget'); const title = document.getElementById('routineWidgetTitle');
             const workoutCatSelect = document.getElementById('workoutCategory');
             
-            workoutCatSelect.innerHTML = '<option value="Rest Day">Rest Day</option>'; // Always allow rest
+            workoutCatSelect.innerHTML = '<option value="Rest Day">Rest Day</option>'; 
 
             fetch(`/api/get_active_routine?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if(data.status === "success" && data.data) {
@@ -874,7 +936,8 @@
             if (!currentUserId) return;
             fetch(`/api/get_weight?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if(data.status === "success") {
-                    const dates = data.data.map(w => w.LogDate).reverse();
+                    // UPDATED: Now runs through our new formatDate helper before passing to the chart
+                    const dates = data.data.map(w => formatDate(w.LogDate)).reverse();
                     const weights = data.data.map(w => w.WeightKG).reverse();
                     renderWeightChart(dates, weights);
                 }
@@ -913,8 +976,10 @@
                 if (!days) { dailyTotals.consumed = 0; dailyTotals.pro = 0; dailyTotals.carb = 0; dailyTotals.fat = 0; }
                 if(data.status === "success" && data.data) {
                     data.data.forEach(m => { 
+                        // Only add to today's macros if it matches today's raw date format
                         if (!days && m.LogDate === today) { dailyTotals.consumed += m.Calories; dailyTotals.pro += m.ProteinGrams; dailyTotals.carb += m.CarbsGrams; dailyTotals.fat += m.FatsGrams; } 
-                        tbody.innerHTML += `<tr><td>${m.LogDate}</td><td style="font-weight: 500;">${m.FoodItem}</td><td>${m.Calories}</td><td><span style="color: var(--text-muted);">${m.ProteinGrams}p / ${m.CarbsGrams}c / ${m.FatsGrams}f</span></td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">Delete</button></td></tr>`; 
+                        // UPDATED: Applies the new Date Formatting logic to the displayed table
+                        tbody.innerHTML += `<tr><td>${formatDate(m.LogDate)}</td><td style="font-weight: 500;">${m.FoodItem}</td><td>${m.Calories}</td><td><span style="color: var(--text-muted);">${m.ProteinGrams}p / ${m.CarbsGrams}c / ${m.FatsGrams}f</span></td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">Delete</button></td></tr>`; 
                     });
                 } 
                 updateNetDeficit(); renderMacroChart();
@@ -929,14 +994,14 @@
                 if(data.status === "success" && data.data) {
                     data.data.forEach(w => { 
                         if (!days && w.LogDate === today) dailyTotals.burned += w.CaloriesBurned; 
-                        tbody.innerHTML += `<tr><td>${w.LogDate}</td><td style="font-weight: 500;">${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">Delete</button></td></tr>`; 
+                        // UPDATED: Applies the new Date Formatting logic to the displayed table
+                        tbody.innerHTML += `<tr><td>${formatDate(w.LogDate)}</td><td style="font-weight: 500;">${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">Delete</button></td></tr>`; 
                     });
                 } 
                 updateNetDeficit();
             });
         }
 
-        // UPDATED: Calculates BMI and status, applies to hover tooltip in header
         function loadDashboardData() {
             if (!currentUserId) { 
                 ['displayGoal', 'displayBMR', 'displayTarget', 'displayBMIVal'].forEach(id => document.getElementById(id).innerText = "---"); 
