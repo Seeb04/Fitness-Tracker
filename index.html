@@ -27,9 +27,9 @@
             background-color: var(--bg-dark);
             color: var(--text-light);
             margin: 0;
-            display: flex;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden; /* Kills the horizontal scrollbar entirely */
         }
 
         @keyframes fadeInUp {
@@ -72,7 +72,12 @@
         .nav-link:hover { color: var(--text-light); background-color: rgba(255, 255, 255, 0.03); transform: translateX(4px); }
         .nav-link.active { background-color: var(--surface); color: var(--primary); border: var(--border-subtle); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
-        .main-content { margin-left: 260px; flex: 1; padding: 3rem; max-width: 1400px; }
+        .main-content {
+            margin-left: 260px;
+            padding: 3rem;
+            width: calc(100% - 260px); /* Perfect math for desktop */
+            max-width: 1400px;
+        }
 
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
 
@@ -93,7 +98,12 @@
         .view-section { display: none; }
         .view-section.active { display: block; }
 
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .dashboard-grid {
+            display: grid;
+            /* This automatically drops it to 1 column if the screen gets too small for 2 */
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.5rem;
+        }
 
         .card {
             background-color: var(--surface); padding: 2rem; border-radius: var(--border-radius);
