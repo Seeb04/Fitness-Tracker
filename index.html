@@ -323,6 +323,27 @@
         //     }
         // }
         // --- AUTH & LOGIN LOGIC ---
+        function loadUserList() {
+            const selector = document.getElementById('loginUserSelector');
+            if (!selector) return;
+            
+            return fetch('/api/get_users')
+                .then(res => res.json())
+                .then(data => {
+                    selector.innerHTML = '';
+                    if(data.status === "success" && data.data && data.data.length > 0) {
+                        data.data.forEach(u => selector.innerHTML += `<option value="${u.UserID}">${u.Username}</option>`);
+                    } else {
+                        selector.innerHTML = '<option value="">-- No Profiles Found --</option>';
+                    }
+                })
+                .catch(err => {
+                    console.error("Load Users Error:", err);
+                    selector.innerHTML = '<option value="">-- Database waking up, please refresh --</option>';
+                    showToast("Database is waking up. Please refresh the page.", "error");
+                });
+        }
+
         function checkAuth() {
             showLoader(); // Turn on the spinner while we ping the database!
 
@@ -332,30 +353,51 @@
                 document.getElementById('headerUsername').innerText = currentUserName;
                 loadDashboardData(); // This will turn off the loader when finished
             } else {
-                fetch('/api/get_users')
-                .then(res => res.json())
-                .then(data => {
-                    const selector = document.getElementById('loginUserSelector'); 
-                    selector.innerHTML = '';
-                    
-                    if(data.status === "success" && data.data && data.data.length > 0) {
-                        data.data.forEach(u => selector.innerHTML += `<option value="${u.UserID}">${u.Username}</option>`);
-                    } else {
-                        selector.innerHTML = '<option value="">-- No Profiles Found --</option>';
-                    }
+                loadUserList().finally(() => {
                     hideLoader(); // Turn off the spinner!
-                })
-                .catch(err => {
-                    console.error("Auth Error:", err);
-                    hideLoader(); // Turn off the spinner so they aren't trapped
-                    
-                    // If Vercel times out, tell the user exactly what to do
-                    const selector = document.getElementById('loginUserSelector');
-                    selector.innerHTML = '<option value="">-- Database waking up, please refresh --</option>';
-                    showToast("Database is waking up. Please refresh the page.", "error");
                 });
             }
         }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userId = document.getElementById('loginUserSelector').value;
+            const passcode = document.getElementById('loginPasscode').value;
+
+            if (!userId) return showToast("Please select a profile", "error");
+
+            showLoader();
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, passcode: passcode })
+            })
+            .then(res => res.json())
+            .then(data => {
+                hideLoader();
+                if (data.status === "success") {
+                    currentUserId = data.data.UserID;
+                    currentUserName = data.data.Username;
+                    localStorage.setItem('selectedUserId', currentUserId);
+                    localStorage.setItem('selectedUserName', currentUserName);
+                    
+                    document.getElementById('loginPasscode').value = '';
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('mainApp').classList.remove('hidden');
+                    document.getElementById('headerUsername').innerText = currentUserName;
+                    showToast("Welcome back, " + currentUserName);
+                    loadDashboardData();
+                } else {
+                    showToast(data.message || "Login failed", "error");
+                }
+            })
+            .catch(err => {
+                hideLoader();
+                console.error("Login Error:", err);
+                showToast("Connection error", "error");
+            });
+        });
+
         function logout() {
             currentUserId = null; localStorage.removeItem('selectedUserId'); localStorage.removeItem('selectedUserName');
             document.getElementById('loginPasscode').value = '';

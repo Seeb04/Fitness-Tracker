@@ -42,8 +42,8 @@ class handler(BaseHTTPRequestHandler):
             else:
                 # Create new user
                 query = """
-                    INSERT INTO Users (Username, Age, WeightKG, HeightCM, Gender, FitnessGoal, CalculatedBMR, TargetCalories)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO Users (Username, Age, WeightKG, HeightCM, Gender, FitnessGoal, CalculatedBMR, TargetCalories, Passcode)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 values = (
                     payload.get('username', 'New User'),
@@ -53,7 +53,8 @@ class handler(BaseHTTPRequestHandler):
                     payload['gender'],
                     payload['goal'],
                     int(payload['bmr']),
-                    int(payload['target_calories'])
+                    int(payload['target_calories']),
+                    '0000' # Default PIN
                 )
             
             cursor.execute(query, values)
