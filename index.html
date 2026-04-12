@@ -64,9 +64,8 @@
     </style>
 </head>
 <body>
-
     <div id="loginScreen" class="login-overlay">
-        <div class="login-card animate-in">
+        <div class="login-card animate-in" id="loginView">
             <h1>TrackFit AI</h1>
             <p style="color: var(--text-muted); margin-bottom: 2rem; text-align: center;">Secure access to your dashboard.</p>
             <form id="loginForm">
@@ -83,6 +82,25 @@
                     <input type="checkbox" id="rememberMe" checked>
                     <label for="rememberMe" style="margin: 0;">Remember me on this device</label>
                 </div>
+                <button type="button" onclick="toggleAuthView('register')" style="background: transparent; color: var(--primary); border: 1px dashed var(--primary); margin-top: 1rem;">+ Create New Profile</button>
+            </form>
+        </div>
+
+        <div class="login-card animate-in hidden" id="registerView">
+            <h1 style="font-size: 1.4rem;">Initialize Profile</h1>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem; text-align: center;">Your default PIN will be <strong>0000</strong>.</p>
+            <form id="registerForm">
+                <div class="form-group"><label>Display Name</label><input type="text" id="regName" required></div>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="form-group" style="flex: 1;"><label>Age</label><input type="number" id="regAge" required></div>
+                    <div class="form-group" style="flex: 1;"><label>Gender</label><select id="regGender"><option value="M">Male</option><option value="F">Female</option></select></div>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="form-group" style="flex: 1;"><label>Weight (kg)</label><input type="number" step="0.1" id="regWeight" required></div>
+                    <div class="form-group" style="flex: 1;"><label>Height (cm)</label><input type="number" step="0.1" id="regHeight" required></div>
+                </div>
+                <button type="submit">Create Account</button>
+                <button type="button" onclick="toggleAuthView('login')" style="background: transparent; color: var(--text-muted); margin-top: 0.5rem;">Back to Login</button>
             </form>
         </div>
     </div>
@@ -310,6 +328,67 @@
             document.getElementById('mainApp').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden');
             checkAuth();
         }
+        // --- REGISTRATION & SECURITY LOGIC ---
+        function toggleAuthView(view) {
+            if (view === 'register') {
+                document.getElementById('loginView').classList.add('hidden');
+                document.getElementById('registerView').classList.remove('hidden');
+            } else {
+                document.getElementById('registerView').classList.add('hidden');
+                document.getElementById('loginView').classList.remove('hidden');
+                checkAuth(); // Refresh the dropdown so the new user appears
+            }
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const payload = {
+                user_id: null, // Triggers database to create a NEW user
+                username: document.getElementById('regName').value,
+                age: parseInt(document.getElementById('regAge').value),
+                weight: parseFloat(document.getElementById('regWeight').value),
+                height: parseFloat(document.getElementById('regHeight').value),
+                gender: document.getElementById('regGender').value,
+                goal: 'Maintain', 
+                manualTarget: ''
+            };
+
+            // Calculate initial BMR for the new account
+            let bmr = Math.round((10 * payload.weight) + (6.25 * payload.height) - (5 * payload.age) + (payload.gender === 'M' ? 5 : -161));
+            payload.bmr = bmr;
+            payload.target_calories = Math.round(bmr * 1.2);
+
+            fetch('/api/add_user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(res => res.json()).then(data => {
+                if(data.status === "success") {
+                    showToast("Profile created! Login with PIN: 0000.");
+                    this.reset();
+                    toggleAuthView('login');
+                } else {
+                    showToast("Database Error", "error");
+                }
+            });
+        });
+
+        document.getElementById('securityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!currentUserId) return;
+            const newPin = document.getElementById('newPasscode').value;
+            
+            fetch('/api/update_passcode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: currentUserId, new_passcode: newPin })
+            }).then(res => res.json()).then(data => {
+                if(data.status === "success") {
+                    showToast("Passcode updated securely!");
+                    this.reset();
+                } else showToast("Error updating passcode", "error");
+            });
+        });
 
         // --- CORE UI ---
         function switchView(viewId, el) {
