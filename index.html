@@ -307,22 +307,6 @@
         };
 
         // --- AUTH & LOGIN LOGIC ---
-        function checkAuth() {
-            if (currentUserId && currentUserId !== "null") {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                document.getElementById('headerUsername').innerText = currentUserName;
-                loadDashboardData();
-            } else {
-                fetch('/api/get_users').then(res => res.json()).then(data => {
-                    const selector = document.getElementById('loginUserSelector'); selector.innerHTML = '';
-                    if(data.status === "success" && data.data) {
-                        data.data.forEach(u => selector.innerHTML += `<option value="${u.UserID}">${u.Username}</option>`);
-                    }
-                });
-            }
-        }
-        // // --- AUTH & LOGIN LOGIC ---
         // function checkAuth() {
         //     if (currentUserId && currentUserId !== "null") {
         //         document.getElementById('loginScreen').classList.add('hidden');
@@ -330,82 +314,48 @@
         //         document.getElementById('headerUsername').innerText = currentUserName;
         //         loadDashboardData();
         //     } else {
-        //         fetch('/api/get_users')
-        //         .then(res => res.json())
-        //         .then(data => {
-        //             const selector = document.getElementById('loginUserSelector'); 
-        //             selector.innerHTML = '';
-                    
-        //             if(data.status === "success" && data.data && data.data.length > 0) {
+        //         fetch('/api/get_users').then(res => res.json()).then(data => {
+        //             const selector = document.getElementById('loginUserSelector'); selector.innerHTML = '';
+        //             if(data.status === "success" && data.data) {
         //                 data.data.forEach(u => selector.innerHTML += `<option value="${u.UserID}">${u.Username}</option>`);
-        //             } else {
-        //                 // THE FIX: Prevents the dropdown from being an invisible, unclickable void
-        //                 selector.innerHTML = '<option value="">-- No Profiles Found --</option>';
         //             }
-        //         })
-        //         .catch(err => {
-        //             console.error("Auth Error:", err);
-        //             showToast("Database connection failed.", "error");
         //         });
         //     }
         // }
+        // --- AUTH & LOGIN LOGIC ---
+        function checkAuth() {
+            showLoader(); // Turn on the spinner while we ping the database!
 
-        // document.getElementById('loginForm').addEventListener('submit', function(e) {
-        //     e.preventDefault();
-        //     const sel = document.getElementById('loginUserSelector');
-            
-        //     // THE FIX: Stops the app from crashing if you hit authenticate on an empty dropdown
-        //     if (sel.options.length === 0 || sel.value === "") {
-        //         return showToast("Please create a New Profile first!", "error");
-        //     }
-
-        //     const uid = sel.value; 
-        //     const uname = sel.options[sel.selectedIndex].text;
-        //     const pin = document.getElementById('loginPasscode').value;
-
-        //     fetch('/api/login', { 
-        //         method: 'POST', 
-        //         headers: { 'Content-Type': 'application/json' }, 
-        //         body: JSON.stringify({ user_id: uid, passcode: pin }) 
-        //     })
-        //     .then(res => res.json())
-        //     .then(data => {
-        //         if(data.status === "success") {
-        //             currentUserId = uid; currentUserName = uname;
-        //             if(document.getElementById('rememberMe').checked) { 
-        //                 localStorage.setItem('selectedUserId', uid); 
-        //                 localStorage.setItem('selectedUserName', uname); 
-        //             }
-        //             document.getElementById('loginScreen').classList.add('hidden'); 
-        //             document.getElementById('mainApp').classList.remove('hidden');
-        //             document.getElementById('headerUsername').innerText = currentUserName;
-        //             showToast("Authentication successful"); 
-        //             loadDashboardData();
-        //         } else {
-        //             showToast("Incorrect passcode. Try 0000.", "error");
-        //         }
-        //     })
-        //     .catch(err => showToast("API Offline or Server Error", "error"));
-        // });
-
-        // document.getElementById('loginForm').addEventListener('submit', function(e) {
-        //     e.preventDefault();
-        //     const sel = document.getElementById('loginUserSelector');
-        //     const uid = sel.value; const uname = sel.options[sel.selectedIndex].text;
-        //     const pin = document.getElementById('loginPasscode').value;
-
-        //     fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: uid, passcode: pin }) })
-        //     .then(res => res.json()).then(data => {
-        //         if(data.status === "success") {
-        //             currentUserId = uid; currentUserName = uname;
-        //             if(document.getElementById('rememberMe').checked) { localStorage.setItem('selectedUserId', uid); localStorage.setItem('selectedUserName', uname); }
-        //             document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('mainApp').classList.remove('hidden');
-        //             document.getElementById('headerUsername').innerText = currentUserName;
-        //             showToast("Authentication successful"); loadDashboardData();
-        //         } else showToast("Incorrect passcode. Try 0000.", "error");
-        //     });
-        // });
-
+            if (currentUserId && currentUserId !== "null") {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('headerUsername').innerText = currentUserName;
+                loadDashboardData(); // This will turn off the loader when finished
+            } else {
+                fetch('/api/get_users')
+                .then(res => res.json())
+                .then(data => {
+                    const selector = document.getElementById('loginUserSelector'); 
+                    selector.innerHTML = '';
+                    
+                    if(data.status === "success" && data.data && data.data.length > 0) {
+                        data.data.forEach(u => selector.innerHTML += `<option value="${u.UserID}">${u.Username}</option>`);
+                    } else {
+                        selector.innerHTML = '<option value="">-- No Profiles Found --</option>';
+                    }
+                    hideLoader(); // Turn off the spinner!
+                })
+                .catch(err => {
+                    console.error("Auth Error:", err);
+                    hideLoader(); // Turn off the spinner so they aren't trapped
+                    
+                    // If Vercel times out, tell the user exactly what to do
+                    const selector = document.getElementById('loginUserSelector');
+                    selector.innerHTML = '<option value="">-- Database waking up, please refresh --</option>';
+                    showToast("Database is waking up. Please refresh the page.", "error");
+                });
+            }
+        }
         function logout() {
             currentUserId = null; localStorage.removeItem('selectedUserId'); localStorage.removeItem('selectedUserName');
             document.getElementById('loginPasscode').value = '';
