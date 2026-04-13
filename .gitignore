@@ -1,6 +1,4 @@
-dbschema.txt
-GEMINI.md
-IDEAS.md
-thinking.txt
-ROADMAP.md
+*.md
+*.txt
+api
 venv
