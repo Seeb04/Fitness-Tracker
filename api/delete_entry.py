@@ -1,7 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 import json
-import mysql.connector
-import os
+from ._db import get_db_connection
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -17,13 +16,7 @@ class handler(BaseHTTPRequestHandler):
             if not user_id or not entry_id or not entry_type:
                 raise ValueError("Missing required fields")
 
-            connection = mysql.connector.connect(
-                host=os.environ.get("DB_HOST"),
-                user=os.environ.get("DB_USER"),
-                password=os.environ.get("DB_PASSWORD"),
-                database=os.environ.get("DB_NAME"),
-                port=int(os.environ.get("DB_PORT", 15463))
-            )
+            connection = get_db_connection()
             cursor = connection.cursor()
 
             if entry_type == 'meal':

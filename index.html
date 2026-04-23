@@ -639,7 +639,7 @@
         }
 
         function loadUserList() {
-            fetch('/api/get_users')
+            fetch('/api/users')
             .then(res => res.json())
             .then(data => {
                 if(data.status !== "success") return;
@@ -727,7 +727,7 @@
         }
 
         function fetchMasterExercises() { 
-            fetch('/api/get_exercises').then(res => res.json()).then(data => { if(data.status === "success") masterExercises = data.data; }); 
+            fetch('/api/workouts?action=exercises').then(res => res.json()).then(data => { if(data.status === "success") masterExercises = data.data; }); 
         }
 
         function addRoutineDay(defaultName = '') {
@@ -791,7 +791,7 @@
                 if(exercises.length > 0) days.push({ day_name: dayName, exercises: exercises });
             });
             
-            fetch('/api/add_routine', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, routine_name: routineName, days: days }) })
+            fetch('/api/routines', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, routine_name: routineName, days: days }) })
             .then(res => res.json()).then(data => {
                 if(data.status === "success") { 
                     showToast("Protocol activated!"); this.reset(); document.getElementById('routineDaysContainer').innerHTML = ''; routineDayCount = 0; 
@@ -808,7 +808,7 @@
             
             workoutCatSelect.innerHTML = '<option value="Rest Day">Rest Day</option>'; // Always allow rest
 
-            fetch(`/api/get_active_routine?user_id=${currentUserId}`).then(res => res.json()).then(data => {
+            fetch(`/api/routines?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if(data.status === "success" && data.data) {
                     const r = data.data; title.innerText = `Active Protocol: ${r.RoutineName}`;
                     if (r.days && r.days.length > 0) {
@@ -833,7 +833,7 @@
 
         function loadRecipes() {
             if (!currentUserId) return;
-            fetch(`/api/get_recipes?user_id=${currentUserId}`).then(res => res.json()).then(data => {
+            fetch(`/api/recipes?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if (data.status === "success") {
                     customRecipes = data.data; const selector = document.getElementById('savedRecipeSelector');
                     selector.innerHTML = '<option value="">Select a saved meal...</option>';
@@ -858,21 +858,21 @@
             if (!name || !cals) return showToast("Food Item and Calories required", "error");
 
             const payload = { user_id: currentUserId, recipe_name: name, calories: parseInt(cals), protein: parseInt(document.getElementById('mealProtein').value || 0), carbs: parseInt(document.getElementById('mealCarbs').value || 0), fats: parseInt(document.getElementById('mealFats').value || 0) };
-            fetch('/api/add_recipe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(res => res.json()).then(data => {
+            fetch('/api/recipes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(res => res.json()).then(data => {
                 if (data.status === "success") { showToast(`${name} added to library`); loadRecipes(); } else showToast(data.message, "error");
             });
         });
 
         document.getElementById('weightForm').addEventListener('submit', function(e) {
             e.preventDefault(); const val = document.getElementById('logWeightVal').value || document.getElementById('logWeightVal').placeholder;
-            fetch('/api/add_weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, date: document.getElementById('weightDate').value, weight: parseFloat(val) }) }).then(res => res.json()).then(data => { 
+            fetch('/api/weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, date: document.getElementById('weightDate').value, weight: parseFloat(val) }) }).then(res => res.json()).then(data => { 
                 if(data.status === "success") { showToast("Weight logged"); e.target.reset(); document.getElementById('weightDate').value = today; loadDashboardData(); } 
             });
         });
 
         function loadWeightHistory() {
             if (!currentUserId) return;
-            fetch(`/api/get_weight?user_id=${currentUserId}`).then(res => res.json()).then(data => {
+            fetch(`/api/weight?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if(data.status === "success") {
                     const dates = data.data.map(w => w.LogDate).reverse();
                     const weights = data.data.map(w => w.WeightKG).reverse();
@@ -886,28 +886,28 @@
             const payload = { user_id: currentUserId, username: getVal('username'), age: parseInt(getVal('userAge')), weight: parseFloat(getVal('userWeight')), height: parseFloat(getVal('userHeight')), gender: document.getElementById('userGender').value, goal: document.getElementById('userGoal').value, manualTarget: document.getElementById('manualTarget').value };
             let bmr = Math.round((10 * payload.weight) + (6.25 * payload.height) - (5 * payload.age) + (payload.gender === 'M' ? 5 : -161));
             payload.bmr = bmr; payload.target_calories = payload.manualTarget ? parseInt(payload.manualTarget) : Math.round(bmr * 1.2 + (payload.goal === 'Cut' ? -500 : payload.goal === 'Bulk' ? 500 : 0));
-            fetch('/api/add_user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(res => res.json()).then(data => { 
+            fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(res => res.json()).then(data => { 
                 if(data.status === "success") { showToast("Profile Synced"); loadUserList(); } else { showToast("Database Error", "error"); }
             });
         });
 
         document.getElementById('mealForm').addEventListener('submit', function(e) {
             e.preventDefault(); const payload = { user_id: currentUserId, date: document.getElementById('mealDate').value, food: document.getElementById('foodItem').value, calories: parseInt(document.getElementById('mealCals').value || 0), protein: parseInt(document.getElementById('mealProtein').value || 0), carbs: parseInt(document.getElementById('mealCarbs').value || 0), fats: parseInt(document.getElementById('mealFats').value || 0) };
-            fetch('/api/add_meal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(() => { 
+            fetch('/api/meals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(() => { 
                 showToast("Nutrition Logged"); e.target.reset(); document.getElementById('mealDate').value = today; document.getElementById('savedRecipeSelector').value = ""; loadDashboardData(); 
             });
         });
 
         document.getElementById('workoutForm').addEventListener('submit', function(e) {
             e.preventDefault(); const payload = { user_id: currentUserId, date: document.getElementById('workoutDate').value, category: document.getElementById('workoutCategory').value, duration: parseInt(document.getElementById('workoutDuration').value || 0), calories: parseInt(document.getElementById('workoutCals').value || 0) };
-            fetch('/api/add_workout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(() => { 
+            fetch('/api/workouts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(() => { 
                 showToast("Activity Logged"); e.target.reset(); document.getElementById('workoutDate').value = today; loadDashboardData(); 
             });
         });
 
         function loadMeals(days = null, btn = null) {
             if (!currentUserId) return; if (btn) { btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
-            const url = days ? `/api/get_meals?user_id=${currentUserId}&days=${days}` : `/api/get_meals?user_id=${currentUserId}`;
+            const url = days ? `/api/meals?user_id=${currentUserId}&days=${days}` : `/api/meals?user_id=${currentUserId}`;
             fetch(url).then(res => res.json()).then(data => {
                 const tbody = document.getElementById('mealTableBody'); tbody.innerHTML = ''; 
                 if (!days) { dailyTotals.consumed = 0; dailyTotals.pro = 0; dailyTotals.carb = 0; dailyTotals.fat = 0; }
@@ -923,7 +923,7 @@
 
         function loadWorkouts(days = null, btn = null) {
             if (!currentUserId) return; if (btn) { btn.parentElement.querySelectorAll('.btn-mini').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
-            const url = days ? `/api/get_workouts?user_id=${currentUserId}&days=${days}` : `/api/get_workouts?user_id=${currentUserId}`;
+            const url = days ? `/api/workouts?user_id=${currentUserId}&days=${days}` : `/api/workouts?user_id=${currentUserId}`;
             fetch(url).then(res => res.json()).then(data => {
                 const tbody = document.getElementById('workoutTableBody'); tbody.innerHTML = ''; if (!days) dailyTotals.burned = 0;
                 if(data.status === "success" && data.data) {
@@ -944,7 +944,7 @@
                 return; 
             }
             
-            fetch(`/api/get_user?user_id=${currentUserId}`).then(res => res.json()).then(data => {
+            fetch(`/api/users?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if(data.status === "success") {
                     const u = data.data; userStats.bmr = u.CalculatedBMR; userStats.target = u.TargetCalories; userStats.goal = u.FitnessGoal;
                     document.getElementById('displayGoal').innerText = u.FitnessGoal || "---"; 
