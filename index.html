@@ -341,7 +341,6 @@
                 </span>
             </div>
             <div class="user-controls">
-                <select id="userSelector"></select>
                 <div class="nav-link header-profile-btn" onclick="switchView('profile', this)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     Profile
@@ -524,6 +523,14 @@
         <section id="profile" class="view-section">
             <div class="dashboard-grid">
                 <div class="card animate-in">
+                    <h2>Account Management</h2>
+                    <div class="form-group">
+                        <label>Switch Profile</label>
+                        <select id="userSelector"></select>
+                    </div>
+                </div>
+
+                <div class="card animate-in" style="animation-delay: 0.1s;">
                     <h2>Biometric Data</h2>
                     <form id="profileForm">
                         <div class="form-group">
@@ -980,7 +987,16 @@
                     document.getElementById('displayGoal').innerText = u.FitnessGoal || "---"; 
                     document.getElementById('displayBMR').innerText = (u.CalculatedBMR || 0) + " kcal"; 
                     document.getElementById('displayTarget').innerText = (u.TargetCalories || 0) + " kcal";
-                    document.getElementById('username').placeholder = u.Username || "--"; document.getElementById('userAge').placeholder = u.Age || "--"; document.getElementById('userWeight').placeholder = u.WeightKG || "--"; document.getElementById('userHeight').placeholder = u.HeightCM || "--"; document.getElementById('userGender').value = u.Gender || "M"; document.getElementById('userGoal').value = u.FitnessGoal || "Maintain"; document.getElementById('logWeightVal').placeholder = u.WeightKG || "--";
+                    
+                    // Fill form values
+                    document.getElementById('username').value = u.Username || ""; 
+                    document.getElementById('userAge').value = u.Age || ""; 
+                    document.getElementById('userWeight').value = u.WeightKG || ""; 
+                    document.getElementById('userHeight').value = u.HeightCM || ""; 
+                    document.getElementById('userGender').value = u.Gender || "M"; 
+                    document.getElementById('userGoal').value = u.FitnessGoal || "Maintain"; 
+                    document.getElementById('manualTarget').value = u.ManualCalorieTarget || "";
+                    document.getElementById('logWeightVal').value = u.WeightKG || "";
                     
                     if (u.WeightKG && u.HeightCM) { 
                         const bmi = (u.WeightKG / ((u.HeightCM / 100) ** 2)).toFixed(1); 
