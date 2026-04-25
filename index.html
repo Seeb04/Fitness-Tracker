@@ -178,6 +178,12 @@
             opacity: 1;
         }
 
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
         .user-controls select {
             background: var(--surface);
             border: var(--border-subtle);
@@ -187,9 +193,30 @@
             font-weight: 500;
             cursor: pointer;
             transition: var(--transition-smooth);
+            min-width: 140px;
         }
         
         .user-controls select:hover { border-color: rgba(255,255,255,0.2); }
+
+        .header-profile-btn {
+            margin-bottom: 0 !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            background: var(--surface);
+            border: var(--border-subtle);
+        }
+
+        .header-profile-btn svg {
+            opacity: 0.7;
+            transition: var(--transition-smooth);
+        }
+
+        .header-profile-btn:hover svg {
+            opacity: 1;
+            color: var(--primary);
+        }
 
         .view-section { display: none; }
         .view-section.active { display: block; }
@@ -295,7 +322,6 @@
         <div class="nav-link active" onclick="switchView('overview', this)">Overview</div>
         <div class="nav-link" onclick="switchView('meals', this)">Nutrition</div>
         <div class="nav-link" onclick="switchView('workouts', this)">Training</div>
-        <div class="nav-link" onclick="switchView('profile', this)">Profile</div>
     </nav>
 
     <main class="main-content">
@@ -316,6 +342,10 @@
             </div>
             <div class="user-controls">
                 <select id="userSelector"></select>
+                <div class="nav-link header-profile-btn" onclick="switchView('profile', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Profile
+                </div>
             </div>
         </div>
 
@@ -671,7 +701,7 @@
             currentUserId = null; 
             localStorage.removeItem('selectedUserId'); 
             document.getElementById('profileForm').reset(); 
-            switchView('profile', document.querySelector('.nav-link:nth-child(4)')); 
+            switchView('profile', document.querySelector('.header-profile-btn')); 
         });
 
         function renderMacroChart() {
