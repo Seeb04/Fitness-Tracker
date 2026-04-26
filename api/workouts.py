@@ -13,18 +13,29 @@ class handler(BaseHTTPRequestHandler):
             cursor = connection.cursor(dictionary=True)
             
             if action == 'exercises':
-                # get_exercises.py
                 cursor.execute("SELECT ExerciseID, Name, MuscleGroup FROM Exercises ORDER BY Name")
                 data = cursor.fetchall()
             else:
-                # get_workouts.py
                 user_id = query_params.get('user_id', ['1'])[0]
                 days = query_params.get('days', [None])[0]
                 if days:
-                    query = "SELECT WorkoutID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, WorkoutCategory, DurationMinutes, CaloriesBurned FROM Workouts WHERE UserID = %s AND LogDate >= DATE_SUB(CURDATE(), INTERVAL %s DAY) ORDER BY LogDate DESC, WorkoutID DESC"
+                    query = """
+                        SELECT WorkoutID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
+                            WorkoutCategory, DurationMinutes, CaloriesBurned 
+                        FROM Workouts 
+                        WHERE UserID = %s AND LogDate >= DATE_SUB(CURDATE(), INTERVAL %s DAY) 
+                        ORDER BY LogDate DESC, WorkoutID DESC
+                    """
                     cursor.execute(query, (user_id, int(days)))
                 else:
-                    query = "SELECT WorkoutID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, WorkoutCategory, DurationMinutes, CaloriesBurned FROM Workouts WHERE UserID = %s ORDER BY LogDate DESC, WorkoutID DESC LIMIT 10"
+                    query = """
+                        SELECT WorkoutID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
+                            WorkoutCategory, DurationMinutes, CaloriesBurned 
+                        FROM Workouts 
+                        WHERE UserID = %s 
+                        ORDER BY LogDate DESC, WorkoutID DESC 
+                        LIMIT 200
+                    """
                     cursor.execute(query, (user_id,))
                 data = cursor.fetchall()
 
@@ -41,7 +52,7 @@ class handler(BaseHTTPRequestHandler):
         try:
             content_length = int(self.headers['Content-Length'])
             payload = json.loads(self.rfile.read(content_length).decode('utf-8'))
-            user_id = payload.get('user_id', 1)
+            user_id = payload.get('user_id')
 
             connection = get_db_connection()
             cursor = connection.cursor()

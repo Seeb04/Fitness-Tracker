@@ -13,11 +13,15 @@ class handler(BaseHTTPRequestHandler):
             connection = get_db_connection()
             cursor = connection.cursor(dictionary=True)
             
+            # If days is provided, we filter by the last X days
+            # If not, we return a larger set (e.g., last 100) to ensure the UI has enough history
             if days:
                 query = """
                     SELECT MealID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
                         FoodItem, Calories, ProteinGrams, CarbsGrams, FatsGrams 
-                    FROM Meals WHERE UserID = %s AND LogDate >= DATE_SUB(CURDATE(), INTERVAL %s DAY)
+                    FROM Meals 
+                    WHERE UserID = %s 
+                    AND LogDate >= DATE_SUB(CURDATE(), INTERVAL %s DAY)
                     ORDER BY LogDate DESC, MealID DESC
                 """
                 cursor.execute(query, (user_id, int(days)))
@@ -25,7 +29,10 @@ class handler(BaseHTTPRequestHandler):
                 query = """
                     SELECT MealID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
                         FoodItem, Calories, ProteinGrams, CarbsGrams, FatsGrams 
-                    FROM Meals WHERE UserID = %s ORDER BY LogDate DESC, MealID DESC LIMIT 10
+                    FROM Meals 
+                    WHERE UserID = %s 
+                    ORDER BY LogDate DESC, MealID DESC 
+                    LIMIT 200
                 """
                 cursor.execute(query, (user_id,))
                 
@@ -43,7 +50,7 @@ class handler(BaseHTTPRequestHandler):
         try:
             content_length = int(self.headers['Content-Length'])
             payload = json.loads(self.rfile.read(content_length).decode('utf-8'))
-            user_id = payload.get('user_id', 1)
+            user_id = payload.get('user_id')
 
             connection = get_db_connection()
             cursor = connection.cursor()
