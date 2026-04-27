@@ -459,7 +459,8 @@
 
     <nav class="sidebar">
         <h1>TrackFit</h1>
-        <div class="nav-link active" onclick="switchView('overview', this)">Overview</div>
+        <div class="nav-link active" onclick="switchView('home', this)">Home</div>
+        <div class="nav-link" onclick="switchView('dashboard', this)">Dashboard</div>
         <div class="nav-link" onclick="switchView('meals', this)">Nutrition</div>
         <div class="nav-link" onclick="switchView('workouts', this)">Training</div>
     </nav>
@@ -546,7 +547,45 @@
             </div>
         </div>
 
-        <section id="overview" class="view-section active">
+        <section id="home" class="view-section active">
+            <div class="dashboard-grid animate-in" style="animation-delay: 0.2s;">
+                <div class="card" style="grid-column: 1 / -1; background: linear-gradient(135deg, var(--surface) 0%, rgba(20, 184, 166, 0.1) 100%);">
+                    <h2 style="font-size: 1.5rem; color: var(--primary);">Welcome to TrackFit AI</h2>
+                    <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6; max-width: 800px;">
+                        Your intelligent command center for fitness and nutrition. TrackFit AI removes the guesswork from your health journey by automating your training protocols and adapting your nutrition goals based on real-time biometric data.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h2 style="color: var(--primary);">1. The Biometric Engine</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                        <strong>How it works:</strong> We use the Mifflin-St Jeor equation to calculate your <strong>Basal Metabolic Rate (BMR)</strong>—the calories you burn at rest based on your age, weight, height, and gender.<br><br>
+                        Your <strong>Maintenance (TDEE)</strong> is calculated by applying a baseline activity multiplier. From there, we add or subtract 500 kcal to calculate your daily <strong>Target</strong> depending on whether you want to Bulk or Cut.<br><br>
+                        <em>Action: Head to the Profile menu to set your metrics and fitness goal.</em>
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h2 style="color: var(--primary);">2. Protocol Architect</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                        <strong>How it works:</strong> Stop guessing what to do at the gym. Our Protocol Architect allows you to load templates (like Push/Pull/Legs) or build your own.<br><br>
+                        Once active, the engine analyzes your logged workout history and automatically predicts your <strong>Next Mission</strong> on the Dashboard. Just click "Quick Log" and the system will advance your schedule.<br><br>
+                        <em>Action: Go to Training > Protocol Architect to load a template.</em>
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h2 style="color: var(--primary);">3. Nutrition & Dashboard</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                        <strong>How it works:</strong> Log your meals in the Nutrition tab to see your macros update in real-time on your Dashboard. You can also save frequent meals as "Recipes" for 1-click logging.<br><br>
+                        Your Dashboard acts as your daily heads-up display, showing your net calorie balance, macro breakdown, and weight timeline.<br><br>
+                        <em>Action: Check out your Dashboard to see your daily balance!</em>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" class="view-section">
             <div class="dashboard-grid animate-in" style="animation-delay: 0.2s;">
                 
                 <div class="card kpi-card">
@@ -1033,9 +1072,9 @@
             document.getElementById('authOverlay').style.display = 'flex';
             document.getElementById('authPasscode').value = '';
             document.getElementById('authUsername').value = '';
-            // Reset to overview just in case
+            // Reset to home just in case
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('overview').classList.add('active');
+            document.getElementById('home').classList.add('active');
             showToast("Logged out successfully");
         }
 
