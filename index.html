@@ -831,6 +831,18 @@
                     const r = data.data; document.getElementById('routineWidgetTitle').innerText = `Active Protocol: ${r.RoutineName}`;
                     r.days.forEach(day => { workoutCatSelect.innerHTML += `<option value="${day.DayName}">${day.DayName}</option>`; });
                     
+                    // Populate Routine Architect
+                    document.getElementById('routineName').value = r.RoutineName;
+                    const container = document.getElementById('routineDaysContainer');
+                    container.innerHTML = '';
+                    routineDayCount = 0;
+                    r.days.forEach(day => {
+                        const dayId = addRoutineDay(day.DayName);
+                        day.exercises.forEach(ex => {
+                            addExerciseToDay(dayId, ex.ExerciseName, ex.TargetSets, ex.TargetReps);
+                        });
+                    });
+
                     let nextDayIndex = 0;
                     if (workoutHistory.length > 0) {
                         const lastRoutineWorkout = workoutHistory.find(w => r.days.some(d => d.DayName === w.WorkoutCategory));
