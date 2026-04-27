@@ -386,7 +386,7 @@
         .dropdown-content .nav-link:hover {
             background: var(--surface-hover);
         }
-        .profile-dropdown:hover .dropdown-content {
+        .dropdown-content.show {
             display: block;
         }
     </style>
@@ -448,7 +448,7 @@
             </div>
             <div class="user-controls">
                 <div class="profile-dropdown">
-                    <div class="nav-link header-profile-btn">
+                    <div class="nav-link header-profile-btn" onclick="toggleProfileDropdown(event)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         <span id="headerUsername">Profile</span>
                     </div>
@@ -1160,8 +1160,16 @@
             });
         }
 
+        function toggleProfileDropdown(e) {
+            e.stopPropagation();
+            document.querySelector('.dropdown-content').classList.toggle('show');
+        }
+
         document.getElementById('btnToggleHistory').addEventListener('click', (e) => { e.stopPropagation(); const d = document.getElementById('loggedDaysDropdown'); d.style.display = d.style.display === 'none' ? 'block' : 'none'; });
-        document.addEventListener('click', () => { const d = document.getElementById('loggedDaysDropdown'); if(d) d.style.display = 'none'; });
+        document.addEventListener('click', () => { 
+            const d = document.getElementById('loggedDaysDropdown'); if(d) d.style.display = 'none'; 
+            const p = document.querySelector('.dropdown-content'); if(p) p.classList.remove('show');
+        });
         document.getElementById('loggedDaysDropdown').addEventListener('click', (e) => e.stopPropagation());
 
         function renderLoggedDays(allMeals) {
