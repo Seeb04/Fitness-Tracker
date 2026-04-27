@@ -124,6 +124,8 @@
             margin-bottom: 3rem;
             background: transparent;
             padding: 0;
+            position: relative;
+            z-index: 1000;
         }
 
         .stats-strip {
@@ -403,8 +405,8 @@
             <h1>TrackFit AI</h1>
             <div id="loginView">
                 <div class="form-group">
-                    <label>Select Profile</label>
-                    <select id="authSelectUser"></select>
+                    <label>Username</label>
+                    <input type="text" id="authUsername" placeholder="e.g., Alex">
                 </div>
                 <div class="form-group">
                     <label>Passcode</label>
@@ -748,8 +750,8 @@
         document.getElementById('workoutDate').value = today;
         document.getElementById('weightDate').value = today;
 
-        let currentUserId = localStorage.getItem('selectedUserId');
-        if (currentUserId === "null" || currentUserId === "undefined" || currentUserId === "") currentUserId = null;
+        let currentUserId = null; // Always require login on refresh for testing
+        localStorage.removeItem('selectedUserId');
 
         let userStats = { bmr: 0, target: 0, goal: 'Maintain', current: {} };
         let dailyTotals = { consumed: 0, burned: 0, pro: 0, carb: 0, fat: 0 };
@@ -761,6 +763,7 @@
         let masterExercises = []; 
         let routineDayCount = 0; 
         let customRecipes = [];
+        let masterUserList = [];
 
         let macroChartInstance = null;
         let weightChartInstance = null;
@@ -832,14 +835,17 @@
         }
 
         function login() {
-            const userId = document.getElementById('authSelectUser').value;
+            const usernameInput = document.getElementById('authUsername').value.trim();
             const passcode = document.getElementById('authPasscode').value;
-            if (!userId || !passcode) return showToast("Select profile and enter passcode", "error");
+            if (!usernameInput || !passcode) return showToast("Enter username and passcode", "error");
+
+            const matchedUser = masterUserList.find(u => u.Username.toLowerCase() === usernameInput.toLowerCase());
+            if (!matchedUser) return showToast("Profile not found. Please create a new account.", "error");
 
             fetch('/api/users?action=login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId, passcode: passcode })
+                body: JSON.stringify({ user_id: matchedUser.UserID, passcode: passcode })
             })
             .then(res => res.json())
             .then(data => {
@@ -882,19 +888,19 @@
             localStorage.removeItem('selectedUserId');
             document.getElementById('authOverlay').style.display = 'flex';
             document.getElementById('authPasscode').value = '';
+            document.getElementById('authUsername').value = '';
             showToast("Logged out successfully");
         }
 
         function loadUserList() {
             fetch('/api/users').then(res => res.json()).then(data => {
                 if(data.status !== "success") return;
+                masterUserList = data.data;
                 const selector = document.getElementById('userSelector'); selector.innerHTML = '';
-                const authSelector = document.getElementById('authSelectUser'); authSelector.innerHTML = '';
                 
                 data.data.forEach(u => { 
                     const opt = document.createElement('option'); opt.value = u.UserID; opt.innerText = u.Username; 
-                    selector.appendChild(opt.cloneNode(true));
-                    authSelector.appendChild(opt);
+                    selector.appendChild(opt);
                 });
 
                 if (currentUserId) {
