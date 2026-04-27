@@ -291,6 +291,15 @@
             -moz-appearance: textfield;
         }
 
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.8;
+            cursor: pointer;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+
         button { background-color: var(--text-light); color: #09090b; border: none; padding: 0.8rem; width: 100%; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: var(--transition-smooth); margin-top: 0.5rem; }
         button:hover { background-color: #e4e4e7; transform: scale(0.98); }
         button[type="submit"] { background-color: var(--primary); color: #fff; }
@@ -481,6 +490,12 @@
                         <span class="tooltip-text">Basal Metabolic Rate: Calories burned at rest (Mifflin-St Jeor formula)</span>
                     </strong>
                 </span>
+                <span>Maintenance:
+                    <strong class="tooltip-container">
+                        <span id="displayMaintenance">---</span>
+                        <span class="tooltip-text">TDEE: BMR × Activity Multiplier (1.2)</span>
+                    </strong>
+                </span>
                 <span>Target: 
                     <strong class="tooltip-container" style="color: var(--primary);">
                         <span id="displayTarget">---</span>
@@ -518,7 +533,10 @@
                 </div>
                 
                 <div class="card">
-                    <h2>Weight Timeline</h2>
+                    <h2 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Weight Timeline</span>
+                        <button class="btn-mini" onclick="quickLogWeightPrompt()" style="margin-top: 0; width: auto; background: var(--primary); color: white; padding: 0.4rem 0.8rem;">+ Log Today</button>
+                    </h2>
                     <div class="chart-container">
                         <canvas id="weightChart"></canvas>
                     </div>
@@ -751,7 +769,10 @@
                     <form id="weightForm">
                         <div class="form-group">
                             <label>Date</label>
-                            <input type="date" id="weightDate" required>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <select id="weightDateSelect" required style="flex: 1;"></select>
+                                <input type="date" id="weightDateCustom" style="width: 3.5rem; padding: 0.8rem 0.5rem; text-align: center; flex: 0 0 auto;" title="Choose custom date">
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Current Mass (kg)</label>
@@ -788,7 +809,39 @@
         const today = getLocalDateString();
         document.getElementById('mealDate').value = today;
         document.getElementById('workoutDate').value = today;
-        document.getElementById('weightDate').value = today;
+
+        function populateWeightDates() {
+            const select = document.getElementById('weightDateSelect');
+            if (!select) return;
+            select.innerHTML = '';
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                const ds = getLocalDateString(d);
+                const opt = document.createElement('option');
+                opt.value = ds;
+                opt.innerText = i === 0 ? "Today" : i === 1 ? "Yesterday" : formatFullDate(ds);
+                select.appendChild(opt);
+            }
+        }
+
+        document.getElementById('weightDateCustom').addEventListener('change', (e) => {
+            const val = e.target.value; if (!val) return;
+            const select = document.getElementById('weightDateSelect');
+            let exists = Array.from(select.options).some(o => o.value === val);
+            if (!exists) {
+                const opt = document.createElement('option'); opt.value = val; opt.innerText = formatFullDate(val);
+                select.insertBefore(opt, select.firstChild);
+            }
+            select.value = val;
+        });
+
+        function quickLogWeightPrompt() {
+            const weight = prompt(`Enter your weight for today (${formatFullDate(today)}):`);
+            if (weight && !isNaN(weight)) {
+                fetch('/api/weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, date: today, weight: parseFloat(weight) }) })
+                .then(() => { showToast("Weight logged!"); loadDashboardData(); });
+            }
+        }
 
         let currentUserId = null; // Always require login on refresh for testing
         localStorage.removeItem('selectedUserId');
@@ -1159,8 +1212,11 @@
         });
 
         document.getElementById('weightForm').addEventListener('submit', function(e) {
-            e.preventDefault(); const val = document.getElementById('logWeightVal').value;
-            fetch('/api/weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, date: document.getElementById('weightDate').value, weight: parseFloat(val) }) }).then(() => { showToast("Weight logged"); loadDashboardData(); });
+            e.preventDefault(); 
+            const val = document.getElementById('logWeightVal').value;
+            const date = document.getElementById('weightDateSelect').value;
+            fetch('/api/weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, date: date, weight: parseFloat(val) }) })
+            .then(() => { showToast("Weight logged"); loadDashboardData(); });
         });
 
         function loadWeightHistory() {
@@ -1275,6 +1331,7 @@
                 const u = data.data; userStats.bmr = u.CalculatedBMR; userStats.target = u.TargetCalories; userStats.goal = u.FitnessGoal;
                 document.getElementById('displayGoal').innerText = u.FitnessGoal || "---"; 
                 document.getElementById('displayBMR').innerText = (u.CalculatedBMR || 0) + " kcal"; 
+                document.getElementById('displayMaintenance').innerText = Math.round((u.CalculatedBMR || 0) * 1.2) + " kcal";
                 document.getElementById('displayTarget').innerText = (u.TargetCalories || 0) + " kcal";
                 document.getElementById('username').value = u.Username || ""; document.getElementById('userAge').value = u.Age || ""; 
                 document.getElementById('userWeight').value = u.WeightKG || ""; document.getElementById('userHeight').value = u.HeightCM || ""; 
@@ -1292,7 +1349,7 @@
                 loadRecipes();
             }
         }
-        window.onload = () => { fetchMasterExercises(); loadUserList(); };
+        window.onload = () => { fetchMasterExercises(); loadUserList(); populateWeightDates(); };
     </script>
 </body>
 </html>
