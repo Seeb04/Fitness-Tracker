@@ -358,6 +358,30 @@
         }
         .auth-card h1 { margin-bottom: 2rem; }
 
+        /* Passcode Toggle */
+        .passcode-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .passcode-toggle {
+            position: absolute;
+            right: 10px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px;
+            margin: 0;
+            width: auto;
+            font-size: 0.8rem;
+        }
+        .passcode-toggle:hover {
+            color: var(--text-light);
+            background: transparent;
+            transform: none;
+        }
+
         /* Profile Dropdown */
         .profile-dropdown {
             position: relative;
@@ -410,7 +434,10 @@
                 </div>
                 <div class="form-group">
                     <label>Passcode</label>
-                    <input type="password" id="authPasscode" placeholder="Enter 4-digit code" maxlength="4">
+                    <div class="passcode-wrapper">
+                        <input type="password" id="authPasscode" placeholder="Enter 4-digit code" maxlength="4">
+                        <button type="button" class="passcode-toggle" onclick="togglePasscode('authPasscode')">Show</button>
+                    </div>
                 </div>
                 <button onclick="login()">Enter Dashboard</button>
                 <button onclick="toggleAuthView('signup')" style="background: transparent; color: var(--text-muted); border: 1px solid var(--border-subtle); margin-top: 1rem;">Create New Account</button>
@@ -422,7 +449,10 @@
                 </div>
                 <div class="form-group">
                     <label>Initial Passcode</label>
-                    <input type="password" id="signupPasscode" placeholder="4-digit code" maxlength="4">
+                    <div class="passcode-wrapper">
+                        <input type="password" id="signupPasscode" placeholder="4-digit code" maxlength="4">
+                        <button type="button" class="passcode-toggle" onclick="togglePasscode('signupPasscode')">Show</button>
+                    </div>
                 </div>
                 <button onclick="signup()">Initialize Profile</button>
                 <button onclick="toggleAuthView('login')" style="background: transparent; color: var(--text-muted); border: 1px solid var(--border-subtle); margin-top: 1rem;">Back to Login</button>
@@ -653,14 +683,6 @@
         <section id="profile" class="view-section">
             <div class="dashboard-grid">
                 <div class="card animate-in">
-                    <h2>Account Management</h2>
-                    <div class="form-group">
-                        <label>Switch Profile</label>
-                        <select id="userSelector"></select>
-                    </div>
-                </div>
-
-                <div class="card animate-in" style="animation-delay: 0.1s;">
                     <h2>Biometric Data</h2>
                     <form id="profileForm">
                         <div class="form-group">
@@ -827,6 +849,18 @@
                 if (type === 'meal') loadMeals(selectedDate);
                 loadDashboardData();
             });
+        }
+
+        function togglePasscode(id) {
+            const input = document.getElementById(id);
+            const btn = input.nextElementSibling;
+            if (input.type === "password") {
+                input.type = "text";
+                btn.innerText = "Hide";
+            } else {
+                input.type = "password";
+                btn.innerText = "Show";
+            }
         }
 
         function toggleAuthView(view) {
