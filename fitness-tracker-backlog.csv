@@ -1,0 +1,11 @@
+Tasks,Priority,Difficulty
+1. calorie prediction. ,4,3
+2. less ambiguous terms. ,5,2
+3. training tab needs to autoload the program/routine. ,1,4
+4. training tab needs to predict the next day according to the routine (i.e. if I have done push day then it should know the next day will be pull day). ,2,6
+5. in the active protocol container the thing should give a button that lets you quick log the workout and then should state the next routine day. ,3,8
+"6. weight timeline's day format needs to be changed to day name date, month, year.",9,1
+7. home tab that gives a quick overview of what this app does and how. ,8,7
+8. login page where the user can create an account or log in. ,7,9
+9. when the profile tab is clicked it should give a drop down menu that shows a button to go to the profile or log out. ,6,5
+10. add a feature in the routine tab where you can take a picture of food which then relays that to some ai which gives the calorie and nutrition breakdown which can be logged. ,10,10

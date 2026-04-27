@@ -498,6 +498,7 @@
                         </div>
                         <button type="submit">Log Session</button>
                     </form>
+                    <div id="trainingExercises" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: var(--border-subtle); font-size: 0.9rem; color: var(--text-muted); display: none;"></div>
                 </div>
                 
                 <div class="card animate-in" style="animation-delay: 0.1s;">
@@ -648,6 +649,9 @@
         let userStats = { bmr: 0, target: 0, goal: 'Maintain', current: {} };
         let dailyTotals = { consumed: 0, burned: 0, pro: 0, carb: 0, fat: 0 };
         let selectedDate = today;
+        
+        let workoutHistory = [];
+        let activeRoutine = null;
         
         let masterExercises = []; 
         let routineDayCount = 0; 
@@ -811,21 +815,62 @@
             .then(res => res.json()).then(data => { if(data.status === "success") { showToast("Protocol activated!"); loadDashboardWidget(); } });
         });
 
+        function quickLogWorkout(dayName) {
+            const p = { user_id: currentUserId, date: today, category: dayName, duration: 60, calories: 300 };
+            fetch('/api/workouts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
+            .then(() => { showToast(`${dayName} logged!`); loadDashboardData(); });
+        }
+
         function loadDashboardWidget() {
             if (!currentUserId) return;
-            const workoutCatSelect = document.getElementById('workoutCategory'); workoutCatSelect.innerHTML = '<option value="Rest Day">Rest Day</option>';
+            const workoutCatSelect = document.getElementById('workoutCategory');
+            workoutCatSelect.innerHTML = '<option value="Rest Day">Rest Day</option>';
             fetch(`/api/routines?user_id=${currentUserId}`).then(res => res.json()).then(data => {
                 if(data.status === "success" && data.data) {
+                    activeRoutine = data.data;
                     const r = data.data; document.getElementById('routineWidgetTitle').innerText = `Active Protocol: ${r.RoutineName}`;
                     r.days.forEach(day => { workoutCatSelect.innerHTML += `<option value="${day.DayName}">${day.DayName}</option>`; });
+                    
+                    let nextDayIndex = 0;
+                    if (workoutHistory.length > 0) {
+                        const lastRoutineWorkout = workoutHistory.find(w => r.days.some(d => d.DayName === w.WorkoutCategory));
+                        if (lastRoutineWorkout) {
+                            const lastDayIndex = r.days.findIndex(d => d.DayName === lastRoutineWorkout.WorkoutCategory);
+                            nextDayIndex = (lastDayIndex + 1) % r.days.length;
+                        }
+                    }
+
                     if (r.days.length > 0) {
-                        const s = r.days[0]; let html = `<h3>${s.DayName}</h3>`;
+                        const s = r.days[nextDayIndex];
+                        workoutCatSelect.value = s.DayName;
+                        workoutCatSelect.dispatchEvent(new Event('change'));
+                        
+                        let html = `<h3>${s.DayName}</h3>`;
                         s.exercises.forEach(ex => { html += `<div class="routine-item"><strong>${ex.ExerciseName}</strong><br>${ex.TargetSets} x ${ex.TargetReps}</div>`; });
+                        html += `<button onclick="quickLogWorkout('${s.DayName}')" style="margin-top: 1rem; background: var(--primary); color: white;">Quick Log Session</button>`;
                         document.getElementById('routineWidget').innerHTML = html;
                     }
                 }
             });
         }
+
+        document.getElementById('workoutCategory').addEventListener('change', function(e) {
+            const val = e.target.value;
+            const container = document.getElementById('trainingExercises');
+            container.innerHTML = '';
+            container.style.display = 'none';
+            if (activeRoutine && val !== 'Rest Day') {
+                const day = activeRoutine.days.find(d => d.DayName === val);
+                if (day) {
+                    let html = '<strong>Target Exercises:</strong><br><br>';
+                    day.exercises.forEach(ex => {
+                        html += `• ${ex.ExerciseName}: ${ex.TargetSets} x ${ex.TargetReps}<br>`;
+                    });
+                    container.innerHTML = html;
+                    container.style.display = 'block';
+                }
+            }
+        });
 
         function loadRecipes() {
             if (!currentUserId) return;
@@ -935,38 +980,44 @@
 
         function loadWorkouts(days = null) {
             const url = `/api/workouts?user_id=${currentUserId}${days ? `&days=${days}` : ''}`;
-            fetch(url).then(res => res.json()).then(data => {
+            return fetch(url).then(res => res.json()).then(data => {
                 const tbody = document.getElementById('workoutTableBody'); tbody.innerHTML = ''; if (!days) dailyTotals.burned = 0;
                 if(data.status === "success" && data.data) {
+                    if (!days) workoutHistory = data.data;
                     data.data.forEach(w => { 
                         if (!days && w.LogDate === today) dailyTotals.burned += w.CaloriesBurned; 
                         tbody.innerHTML += `<tr><td>${formatFullDate(w.LogDate)}</td><td>${w.WorkoutCategory}</td><td>${w.DurationMinutes}m</td><td>${w.CaloriesBurned}</td><td><button class="btn-delete" onclick="deleteEntry(${w.WorkoutID}, 'workout')">Delete</button></td></tr>`; 
                     });
                 } 
                 updateNetDeficit();
+                return data;
             });
         }
 
-        function loadDashboardData() {
+        async function loadDashboardData() {
             if (!currentUserId) return;
-            fetch(`/api/users?user_id=${currentUserId}`).then(res => res.json()).then(data => {
-                if(data.status === "success") {
-                    const u = data.data; userStats.bmr = u.CalculatedBMR; userStats.target = u.TargetCalories; userStats.goal = u.FitnessGoal;
-                    document.getElementById('displayGoal').innerText = u.FitnessGoal || "---"; 
-                    document.getElementById('displayBMR').innerText = (u.CalculatedBMR || 0) + " kcal"; 
-                    document.getElementById('displayTarget').innerText = (u.TargetCalories || 0) + " kcal";
-                    document.getElementById('username').value = u.Username || ""; document.getElementById('userAge').value = u.Age || ""; 
-                    document.getElementById('userWeight').value = u.WeightKG || ""; document.getElementById('userHeight').value = u.HeightCM || ""; 
-                    document.getElementById('userGender').value = u.Gender || "M"; document.getElementById('userGoal').value = u.FitnessGoal || "Maintain"; 
-                    document.getElementById('manualTarget').value = u.ManualCalorieTarget || ""; document.getElementById('logWeightVal').value = u.WeightKG || "";
-                    if (u.WeightKG && u.HeightCM) { 
-                        const bmi = (u.WeightKG / ((u.HeightCM / 100) ** 2)).toFixed(1); document.getElementById('displayBMIVal').innerText = bmi; 
-                        let s = "Normal", c = "var(--success)"; if (bmi < 18.5) { s = "Underweight"; c = "var(--text-muted)"; } else if (bmi >= 25 && bmi < 29.9) { s = "Overweight"; c = "orange"; } else if (bmi >= 30) { s = "Obese"; c = "var(--danger)"; }
-                        document.getElementById('bmiTooltip').innerText = s; document.getElementById('bmiTooltip').style.color = c;
-                    }
-                    loadMeals(selectedDate); loadWorkouts(); loadWeightHistory(); loadDashboardWidget(); loadRecipes();
+            const res = await fetch(`/api/users?user_id=${currentUserId}`);
+            const data = await res.json();
+            if(data.status === "success") {
+                const u = data.data; userStats.bmr = u.CalculatedBMR; userStats.target = u.TargetCalories; userStats.goal = u.FitnessGoal;
+                document.getElementById('displayGoal').innerText = u.FitnessGoal || "---"; 
+                document.getElementById('displayBMR').innerText = (u.CalculatedBMR || 0) + " kcal"; 
+                document.getElementById('displayTarget').innerText = (u.TargetCalories || 0) + " kcal";
+                document.getElementById('username').value = u.Username || ""; document.getElementById('userAge').value = u.Age || ""; 
+                document.getElementById('userWeight').value = u.WeightKG || ""; document.getElementById('userHeight').value = u.HeightCM || ""; 
+                document.getElementById('userGender').value = u.Gender || "M"; document.getElementById('userGoal').value = u.FitnessGoal || "Maintain"; 
+                document.getElementById('manualTarget').value = u.ManualCalorieTarget || ""; document.getElementById('logWeightVal').value = u.WeightKG || "";
+                if (u.WeightKG && u.HeightCM) { 
+                    const bmi = (u.WeightKG / ((u.HeightCM / 100) ** 2)).toFixed(1); document.getElementById('displayBMIVal').innerText = bmi; 
+                    let s = "Normal", c = "var(--success)"; if (bmi < 18.5) { s = "Underweight"; c = "var(--text-muted)"; } else if (bmi >= 25 && bmi < 29.9) { s = "Overweight"; c = "orange"; } else if (bmi >= 30) { s = "Obese"; c = "var(--danger)"; }
+                    document.getElementById('bmiTooltip').innerText = s; document.getElementById('bmiTooltip').style.color = c;
                 }
-            });
+                loadMeals(selectedDate); 
+                await loadWorkouts(); 
+                loadWeightHistory(); 
+                loadDashboardWidget(); 
+                loadRecipes();
+            }
         }
         window.onload = () => { fetchMasterExercises(); loadUserList(); };
     </script>
