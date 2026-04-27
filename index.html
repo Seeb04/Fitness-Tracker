@@ -300,6 +300,29 @@
             opacity: 1;
         }
 
+        .calendar-only {
+            width: 32px !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .calendar-only::-webkit-datetime-edit, 
+        .calendar-only::-webkit-inner-spin-button, 
+        .calendar-only::-webkit-clear-button {
+            display: none !important;
+            -webkit-appearance: none;
+        }
+        .calendar-only::-webkit-calendar-picker-indicator {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            filter: invert(1);
+        }
+
         button { background-color: var(--text-light); color: #09090b; border: none; padding: 0.8rem; width: 100%; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: var(--transition-smooth); margin-top: 0.5rem; }
         button:hover { background-color: #e4e4e7; transform: scale(0.98); }
         button[type="submit"] { background-color: var(--primary); color: #fff; }
@@ -771,7 +794,7 @@
                             <label>Date</label>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 <select id="weightDateSelect" required style="flex: 1;"></select>
-                                <input type="date" id="weightDateCustom" style="width: 3.5rem; padding: 0.8rem 0.5rem; text-align: center; flex: 0 0 auto;" title="Choose custom date">
+                                <input type="date" id="weightDateCustom" class="calendar-only" title="Choose custom date">
                             </div>
                         </div>
                         <div class="form-group">
