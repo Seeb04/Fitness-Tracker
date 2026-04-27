@@ -475,8 +475,18 @@
         <div class="header animate-in" style="animation-delay: 0.1s;">
             <div class="stats-strip">
                 <span>Goal: <strong id="displayGoal">---</strong></span>
-                <span>BMR: <strong id="displayBMR">---</strong></span>
-                <span>Target: <strong id="displayTarget" style="color: var(--primary);">---</strong></span>
+                <span>BMR: 
+                    <strong class="tooltip-container">
+                        <span id="displayBMR">---</span>
+                        <span class="tooltip-text">Basal Metabolic Rate: Calories burned at rest (Mifflin-St Jeor formula)</span>
+                    </strong>
+                </span>
+                <span>Target: 
+                    <strong class="tooltip-container" style="color: var(--primary);">
+                        <span id="displayTarget">---</span>
+                        <span class="tooltip-text">Daily Goal: BMR × Activity (1.2) + Goal Offset (±500 kcal)</span>
+                    </strong>
+                </span>
                 <span>BMI: 
                     <strong class="tooltip-container" style="color: var(--primary);">
                         <span id="displayBMIVal">---</span>
@@ -1156,7 +1166,11 @@
         function loadWeightHistory() {
             if (!currentUserId) return;
             fetch(`/api/weight?user_id=${currentUserId}`).then(res => res.json()).then(data => {
-                if(data.status === "success") { renderWeightChart(data.data.map(w => w.LogDate).reverse(), data.data.map(w => w.WeightKG).reverse()); }
+                if(data.status === "success") { 
+                    const labels = data.data.map(w => formatFullDate(w.LogDate)).reverse();
+                    const weights = data.data.map(w => w.WeightKG).reverse();
+                    renderWeightChart(labels, weights); 
+                }
             });
         }
 
