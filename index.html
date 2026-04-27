@@ -936,6 +936,18 @@
             });
         }
 
+        function logout() {
+            currentUserId = null;
+            localStorage.removeItem('selectedUserId');
+            document.getElementById('authOverlay').style.display = 'flex';
+            document.getElementById('authPasscode').value = '';
+            document.getElementById('authUsername').value = '';
+            // Reset to overview just in case
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('overview').classList.add('active');
+            showToast("Logged out successfully");
+        }
+
         function loadUserList() {
             return fetch('/api/users')
                 .then(res => res.json())
