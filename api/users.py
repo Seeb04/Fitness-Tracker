@@ -77,7 +77,7 @@ class handler(BaseHTTPRequestHandler):
                 else:
                     # Create
                     query = "INSERT INTO Users (Username, Age, WeightKG, HeightCM, Gender, FitnessGoal, CalculatedBMR, TargetCalories, Passcode) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                    values = (payload.get('username', 'New User'), int(payload['age']), float(payload['weight']), float(payload['height']), payload['gender'], payload['goal'], int(payload['bmr']), int(payload['target_calories']), '0000')
+                    values = (payload.get('username', 'New User'), int(payload['age']), float(payload['weight']), float(payload['height']), payload['gender'], payload['goal'], int(payload['bmr']), int(payload['target_calories']), payload.get('passcode', '0000'))
                     msg = "New profile created!"
                 
                 cursor.execute(query, values)
