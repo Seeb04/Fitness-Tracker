@@ -881,8 +881,13 @@
             const passcode = document.getElementById('authPasscode').value;
             if (!usernameInput || !passcode) return showToast("Enter username and passcode", "error");
 
+            console.log("Attempting login for:", usernameInput);
+            console.log("Available users:", masterUserList.map(u => u.Username));
+
             const matchedUser = masterUserList.find(u => u.Username.toLowerCase() === usernameInput.toLowerCase());
-            if (!matchedUser) return showToast("Profile not found. Please create a new account.", "error");
+            if (!matchedUser) {
+                return showToast(`Profile "${usernameInput}" not found.`, "error");
+            }
 
             fetch('/api/users?action=login', {
                 method: 'POST',
@@ -901,11 +906,15 @@
                 } else {
                     showToast(data.message, "error");
                 }
+            })
+            .catch(err => {
+                console.error("Login Error:", err);
+                showToast("Connection error", "error");
             });
         }
 
         function signup() {
-            const username = document.getElementById('signupUsername').value;
+            const username = document.getElementById('signupUsername').value.trim();
             const passcode = document.getElementById('signupPasscode').value;
             if (!username || passcode.length !== 4) return showToast("Enter username and 4-digit passcode", "error");
 
@@ -920,31 +929,19 @@
                 if (data.status === "success") {
                     showToast("Profile created! Please login.");
                     toggleAuthView('login');
-                    loadUserList();
+                    loadUserList(); // Refresh list after signup
+                } else {
+                    showToast(data.message || "Signup failed", "error");
                 }
             });
         }
 
-        function logout() {
-            currentUserId = null;
-            localStorage.removeItem('selectedUserId');
-            document.getElementById('authOverlay').style.display = 'flex';
-            document.getElementById('authPasscode').value = '';
-            document.getElementById('authUsername').value = '';
-            showToast("Logged out successfully");
-        }
-
         function loadUserList() {
-            fetch('/api/users').then(res => res.json()).then(data => {
+            return fetch('/api/users').then(res => res.json()).then(data => {
                 if(data.status !== "success") return;
                 masterUserList = data.data;
-                const selector = document.getElementById('userSelector'); selector.innerHTML = '';
+                console.log("User list loaded:", masterUserList.length, "users found.");
                 
-                data.data.forEach(u => { 
-                    const opt = document.createElement('option'); opt.value = u.UserID; opt.innerText = u.Username; 
-                    selector.appendChild(opt);
-                });
-
                 if (currentUserId) {
                     document.getElementById('authOverlay').style.display = 'none';
                     loadDashboardData();
