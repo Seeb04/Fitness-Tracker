@@ -34,7 +34,16 @@ class handler(BaseHTTPRequestHandler):
             connection = get_db_connection()
             cursor = connection.cursor()
 
-            cursor.execute("INSERT INTO WeightLogs (UserID, LogDate, WeightKG) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE WeightKG = %s", (user_id, payload['date'], payload['weight'], payload['weight']))
+            # Check if a weight entry already exists for this user and date
+            cursor.execute("SELECT 1 FROM WeightLogs WHERE UserID = %s AND LogDate = %s", (user_id, payload['date']))
+            if cursor.fetchone():
+                # Update existing record
+                cursor.execute("UPDATE WeightLogs SET WeightKG = %s WHERE UserID = %s AND LogDate = %s", (payload['weight'], user_id, payload['date']))
+            else:
+                # Insert new record
+                cursor.execute("INSERT INTO WeightLogs (UserID, LogDate, WeightKG) VALUES (%s, %s, %s)", (user_id, payload['date'], payload['weight']))
+
+            # Sync the new weight to the main Users table
             cursor.execute("UPDATE Users SET WeightKG = %s WHERE UserID = %s", (payload['weight'], user_id))
             
             connection.commit()
