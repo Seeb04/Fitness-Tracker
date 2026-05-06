@@ -1,3 +1,0 @@
-- Macro's chart needs a button to display past macros
-- Option to add/delete an exercise from a plan
-- Option to delete a saved recipe
