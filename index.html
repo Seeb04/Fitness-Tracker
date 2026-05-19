@@ -1157,10 +1157,17 @@
             let dataArr = [dailyTotals.pro, dailyTotals.carb, dailyTotals.fat];
             let colors = ['#14b8a6', '#a1a1aa', '#f43f5e'];
             if (dailyTotals.pro === 0 && dailyTotals.carb === 0 && dailyTotals.fat === 0) { dataArr = [1]; colors = ['#27272a']; }
+            
+            // Calculate macro targets (approximate: 30% pro, 40% carb, 30% fat)
+            const targetCals = userStats.target || 2000;
+            const tPro = Math.round((targetCals * 0.3) / 4);
+            const tCarb = Math.round((targetCals * 0.4) / 4);
+            const tFat = Math.round((targetCals * 0.3) / 9);
+
             macroChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: dataArr.length === 1 ? ['No Data'] : ['Protein (g)', 'Carbs (g)', 'Fats (g)'],
+                    labels: dataArr.length === 1 ? ['No Data'] : [`Protein (${dailyTotals.pro}/${tPro}g)`, `Carbs (${dailyTotals.carb}/${tCarb}g)`, `Fats (${dailyTotals.fat}/${tFat}g)`],
                     datasets: [{ data: dataArr, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, boxWidth: 8 } } } }
@@ -1242,12 +1249,29 @@
         function addRoutineDay(defaultName = '') {
             routineDayCount++; const dayId = routineDayCount;
             const container = document.getElementById('routineDaysContainer');
+            
+            // Remove empty state if it exists
+            const emptyState = container.querySelector('.architect-empty-state');
+            if (emptyState) emptyState.remove();
+
             const dayDiv = document.createElement('div'); dayDiv.className = 'builder-day';
-            dayDiv.innerHTML = `<h3>Day ${dayId} <button type="button" class="btn-delete" onclick="this.parentElement.parentElement.remove()">X</button></h3>
+            dayDiv.innerHTML = `<h3>Day ${dayId} <button type="button" class="btn-delete" onclick="this.parentElement.parentElement.remove(); checkArchitectEmptyState();">X</button></h3>
                 <input type="text" class="day-name-input" placeholder="e.g., Push Day" value="${defaultName}" required style="width: 100%; margin-bottom: 0.5rem;">
                 <div id="exercises-for-day-${dayId}"></div>
                 <button type="button" onclick="addExerciseToDay(${dayId})" style="background: #09090b; color: var(--text-light); font-size: 0.8rem; padding: 0.4rem;">+ Add Exercise</button>`;
             container.appendChild(dayDiv); if (!defaultName) addExerciseToDay(dayId); return dayId;
+        }
+
+        function checkArchitectEmptyState() {
+            const container = document.getElementById('routineDaysContainer');
+            if (container.children.length === 0) {
+                container.innerHTML = `
+                <div class="architect-empty-state" style="padding: 3rem; text-align: center; border: 2px dashed rgba(255,255,255,0.05); border-radius: 12px; color: var(--text-muted);">
+                    <div style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.3;">🏋️‍♂️</div>
+                    <p>No days added to this protocol yet.</p>
+                    <p style="font-size: 0.85rem;">Click <strong>+ Add Day</strong> below to start building your training split.</p>
+                </div>`;
+            }
         }
 
         function addExerciseToDay(dayId, exName = '', sets = '', reps = '') {
@@ -1282,7 +1306,7 @@
 
         document.getElementById('routineTemplateSelector').addEventListener('change', function(e) {
             const val = e.target.value; const container = document.getElementById('routineDaysContainer'); const nameInput = document.getElementById('routineName');
-            container.innerHTML = ''; routineDayCount = 0; if (val === 'custom') { nameInput.value = ''; addRoutineDay(); return; }
+            container.innerHTML = ''; routineDayCount = 0; if (val === 'custom') { nameInput.value = ''; checkArchitectEmptyState(); return; }
             const tpl = routineTemplates[val]; nameInput.value = tpl.name;
             tpl.days.forEach(day => { const dayId = addRoutineDay(day.name); day.exercises.forEach(ex => { addExerciseToDay(dayId, ex.name, ex.sets, ex.reps); }); });
             showToast("Template loaded");
@@ -1390,10 +1414,29 @@
         }
 
         document.getElementById('savedRecipeSelector').addEventListener('change', function(e) {
-            const r = customRecipes.find(rc => rc.RecipeID === parseInt(e.target.value));
-            if (r) { document.getElementById('foodItem').value = r.RecipeName; document.getElementById('mealCals').value = r.Calories; 
-                document.getElementById('mealProtein').value = r.ProteinGrams; document.getElementById('mealCarbs').value = r.CarbsGrams; 
-                document.getElementById('mealFats').value = r.FatsGrams; showToast("Recipe loaded"); }
+            const val = e.target.value;
+            if (!val) return;
+
+            if (val.startsWith('recent-')) {
+                const opt = e.target.options[e.target.selectedIndex];
+                const r = JSON.parse(opt.dataset.mealData);
+                document.getElementById('foodItem').value = r.FoodItem;
+                document.getElementById('mealCals').value = r.Calories;
+                document.getElementById('mealProtein').value = r.ProteinGrams;
+                document.getElementById('mealCarbs').value = r.CarbsGrams;
+                document.getElementById('mealFats').value = r.FatsGrams;
+                showToast("Previous meal loaded");
+            } else {
+                const r = customRecipes.find(rc => rc.RecipeID === parseInt(val));
+                if (r) {
+                    document.getElementById('foodItem').value = r.RecipeName;
+                    document.getElementById('mealCals').value = r.Calories;
+                    document.getElementById('mealProtein').value = r.ProteinGrams;
+                    document.getElementById('mealCarbs').value = r.CarbsGrams;
+                    document.getElementById('mealFats').value = r.FatsGrams;
+                    showToast("Recipe loaded");
+                }
+            }
         });
 
         document.getElementById('btnSaveAsRecipe').addEventListener('click', function() {
@@ -1426,8 +1469,6 @@
         document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault(); const getVal = (id) => document.getElementById(id).value || document.getElementById(id).placeholder;
             const p = { user_id: currentUserId, username: getVal('username'), age: parseInt(getVal('userAge')), weight: parseFloat(getVal('userWeight')), height: parseFloat(getVal('userHeight')), gender: document.getElementById('userGender').value, goal: document.getElementById('userGoal').value, manualTarget: document.getElementById('manualTarget').value };
-            let bmr = Math.round((10 * p.weight) + (6.25 * p.height) - (5 * p.age) + (p.gender === 'M' ? 5 : -161));
-            p.bmr = bmr; p.target_calories = p.manualTarget ? parseInt(p.manualTarget) : Math.round(bmr * 1.2 + (p.goal === 'Cut' ? -500 : p.goal === 'Bulk' ? 500 : 0));
             fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }).then(() => { showToast("Profile synced"); loadUserList(); });
         });
 
@@ -1454,6 +1495,30 @@
                         if (selectedDate === today) { dailyTotals.consumed += m.Calories; dailyTotals.pro += m.ProteinGrams; dailyTotals.carb += m.CarbsGrams; dailyTotals.fat += m.FatsGrams; }
                         tbody.innerHTML += `<tr><td>${formatFullDate(m.LogDate)}</td><td>${m.FoodItem}</td><td>${m.Calories}</td><td>${m.ProteinGrams}p / ${m.CarbsGrams}c / ${m.FatsGrams}f</td><td><button class="btn-delete" onclick="deleteEntry(${m.MealID}, 'meal')">Delete</button></td></tr>`;
                     });
+
+                    // Recently Logged Quick-Fill
+                    const selector = document.getElementById('savedRecipeSelector');
+                    let recentGroup = selector.querySelector('optgroup[label="Recently Logged"]');
+                    if (!recentGroup) {
+                        recentGroup = document.createElement('optgroup');
+                        recentGroup.label = "Recently Logged";
+                        selector.appendChild(recentGroup);
+                    }
+                    recentGroup.innerHTML = '';
+                    const uniqueMeals = [];
+                    const seen = new Set();
+                    meals.forEach(m => {
+                        if (!seen.has(m.FoodItem) && uniqueMeals.length < 5) {
+                            seen.add(m.FoodItem);
+                            uniqueMeals.push(m);
+                            const opt = document.createElement('option');
+                            opt.value = `recent-${m.MealID}`; // Fake ID for lookup
+                            opt.dataset.mealData = JSON.stringify(m);
+                            opt.innerText = `${m.FoodItem} (${m.Calories} kcal)`;
+                            recentGroup.appendChild(opt);
+                        }
+                    });
+
                     renderWeeklyChart(meals); renderLoggedDays(meals);
                 } 
                 if (selectedDate === today) { updateNetDeficit(); renderMacroChart(); }
@@ -1469,13 +1534,28 @@
             }
             allMeals.forEach(m => { if (totals[m.LogDate] !== undefined) totals[m.LogDate] += m.Calories; });
             if (weeklyCalsChartInstance) weeklyCalsChartInstance.destroy();
+
+            const target = userStats.target || 2000;
+
             weeklyCalsChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: last7.map(d => { const [y,m,day]=d.split('-').map(Number); return new Date(y,m-1,day).toLocaleDateString('en-GB',{weekday:'short'}); }),
-                    datasets: [{ label: 'Calories', data: last7.map(d => totals[d]), backgroundColor: last7.map(d => d === today ? '#14b8a6' : 'rgba(20, 184, 166, 0.3)'), borderRadius: 6 }]
+                    datasets: [
+                        { label: 'Calories', data: last7.map(d => totals[d]), backgroundColor: last7.map(d => d === today ? '#14b8a6' : 'rgba(20, 184, 166, 0.3)'), borderRadius: 6, order: 2 },
+                        { label: 'Daily Target', data: last7.map(() => target), type: 'line', borderColor: 'rgba(255, 255, 255, 0.2)', borderDash: [5, 5], borderWidth: 1, pointRadius: 0, fill: false, order: 1 }
+                    ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } } }, onClick: (e, el) => { if (el.length > 0) loadMeals(last7[el[0].index]); } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { 
+                        x: { grid: { display: false } }, 
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } } 
+                    }, 
+                    onClick: (e, el) => { if (el.length > 0) loadMeals(last7[el[0].index]); } 
+                }
             });
         }
 

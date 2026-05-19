@@ -3,6 +3,21 @@ import json
 from urllib.parse import urlparse, parse_qs
 from ._db import get_db_connection
 
+def calculate_bmr(weight, height, age, gender):
+    """Mifflin-St Jeor Equation"""
+    try:
+        w, h, a = float(weight), float(height), int(age)
+        offset = 5 if gender == 'M' else -161
+        return round((10 * w) + (6.25 * h) - (5 * a) + offset)
+    except:
+        return 0
+
+def calculate_target_calories(bmr, goal, manual_target=None):
+    if manual_target and str(manual_target).strip():
+        return int(manual_target)
+    offset = -500 if goal == 'Cut' else 500 if goal == 'Bulk' else 0
+    return round(bmr * 1.2) + offset
+
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
@@ -68,20 +83,27 @@ class handler(BaseHTTPRequestHandler):
             
             else:
                 # Edge casing: Prevent negative values
-                if int(payload['age']) < 0 or float(payload['weight']) < 0 or float(payload['height']) < 0 or int(payload['bmr']) < 0 or int(payload['target_calories']) < 0:
+                age = int(payload.get('age', 0))
+                weight = float(payload.get('weight', 0))
+                height = float(payload.get('height', 0))
+                
+                if age < 0 or weight < 0 or height < 0:
                     return self.send_json_response(400, {"status": "error", "message": "Biometric values cannot be negative"})
 
-                # add_user.py
+                # Calculate on backend
+                bmr = calculate_bmr(weight, height, age, payload['gender'])
+                target = calculate_target_calories(bmr, payload['goal'], payload.get('manualTarget'))
+
                 user_id = payload.get('user_id')
                 if user_id:
                     # Update
                     query = "UPDATE Users SET Age = %s, WeightKG = %s, HeightCM = %s, Gender = %s, FitnessGoal = %s, CalculatedBMR = %s, TargetCalories = %s, Username = %s WHERE UserID = %s"
-                    values = (int(payload['age']), float(payload['weight']), float(payload['height']), payload['gender'], payload['goal'], int(payload['bmr']), int(payload['target_calories']), payload.get('username', 'User'), user_id)
+                    values = (age, weight, height, payload['gender'], payload['goal'], bmr, target, payload.get('username', 'User'), user_id)
                     msg = "Profile updated!"
                 else:
                     # Create
                     query = "INSERT INTO Users (Username, Age, WeightKG, HeightCM, Gender, FitnessGoal, CalculatedBMR, TargetCalories, Passcode) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                    values = (payload.get('username', 'New User'), int(payload['age']), float(payload['weight']), float(payload['height']), payload['gender'], payload['goal'], int(payload['bmr']), int(payload['target_calories']), payload.get('passcode', '0000'))
+                    values = (payload.get('username', 'New User'), age, weight, height, payload['gender'], payload['goal'], bmr, target, payload.get('passcode', '0000'))
                     msg = "New profile created!"
                 
                 cursor.execute(query, values)
