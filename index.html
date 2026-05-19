@@ -937,7 +937,7 @@
             });
         }
 
-        const setupCustomDateListener = (inputId, selectId) => {
+        const setupCustomDateListener = (inputId, selectId, reloadFn = null) => {
             const input = document.getElementById(inputId);
             if (!input) return;
             input.addEventListener('change', (e) => {
@@ -949,12 +949,16 @@
                     select.insertBefore(opt, select.firstChild);
                 }
                 select.value = val;
+                if (reloadFn) reloadFn(val);
             });
         };
 
         setupCustomDateListener('weightDateCustom', 'weightDateSelect');
-        setupCustomDateListener('mealDateCustom', 'mealDate');
-        setupCustomDateListener('workoutDateCustom', 'workoutDate');
+        setupCustomDateListener('mealDateCustom', 'mealDate', (val) => loadMeals(val));
+        setupCustomDateListener('workoutDateCustom', 'workoutDate', (val) => {
+            selectedDate = val; 
+            loadWorkouts(); 
+        });
 
         function quickLogWeightPrompt() {
             const weight = prompt(`Enter your weight for today (${formatFullDate(today)}):`);
