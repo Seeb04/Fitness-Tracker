@@ -952,8 +952,7 @@
             }
         }
 
-        // let currentUserId = null; // Always require login on refresh for testing
-        localStorage.removeItem('selectedUserId');
+        let currentUserId = parseInt(localStorage.getItem('selectedUserId')) || null;
 
         let userStats = { bmr: 0, target: 0, goal: 'Maintain', current: {} };
         let dailyTotals = { consumed: 0, burned: 0, pro: 0, carb: 0, fat: 0 };
@@ -1133,6 +1132,8 @@
                     console.log("Successfully loaded masterUserList. Count:", masterUserList.length);
                     
                     if (currentUserId) {
+                        const u = masterUserList.find(user => user.UserID === currentUserId);
+                        if (u) document.getElementById('headerUsername').innerText = u.Username;
                         document.getElementById('authOverlay').style.display = 'none';
                         loadDashboardData();
                     } else {
