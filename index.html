@@ -301,12 +301,17 @@
         }
 
         .calendar-only {
-            width: 32px !important;
+            width: 100% !important;
+            height: 100% !important;
             padding: 0 !important;
             background: transparent !important;
             border: none !important;
             cursor: pointer;
             overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
         }
         .calendar-only::-webkit-datetime-edit, 
         .calendar-only::-webkit-inner-spin-button, 
@@ -321,6 +326,7 @@
             height: 100%;
             cursor: pointer;
             filter: invert(1);
+            opacity: 0; /* Keep it clickable but invisible */
         }
 
         button { background-color: var(--text-light); color: #09090b; border: none; padding: 0.8rem; width: 100%; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: var(--transition-smooth); margin-top: 0.5rem; }
@@ -650,11 +656,11 @@
                             <label>Date</label>
                             <div style="position: relative; display: flex; align-items: center; gap: 0.5rem;">
                                 <select id="mealDate" required style="flex: 1;"></select>
-                                <div style="position: relative; width: 3rem; height: 3rem; flex: 0 0 auto;">
-                                    <button type="button" style="width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; margin: 0;">
+                                <div style="position: relative; width: 3rem; height: 3rem; flex: 0 0 auto; display: flex; align-items: center; justify-content: center;">
+                                    <button type="button" style="width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; margin: 0; position: relative; z-index: 1;">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                     </button>
-                                    <input type="date" id="mealDateCustom" class="calendar-only" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0;">
+                                    <input type="date" id="mealDateCustom" class="calendar-only">
                                 </div>
                             </div>
                         </div>
@@ -730,11 +736,11 @@
                             <label>Date</label>
                             <div style="position: relative; display: flex; align-items: center; gap: 0.5rem;">
                                 <select id="workoutDate" required style="flex: 1;"></select>
-                                <div style="position: relative; width: 3rem; height: 3rem; flex: 0 0 auto;">
-                                    <button type="button" style="width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; margin: 0;">
+                                <div style="position: relative; width: 3rem; height: 3rem; flex: 0 0 auto; display: flex; align-items: center; justify-content: center;">
+                                    <button type="button" style="width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; margin: 0; position: relative; z-index: 1;">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                     </button>
-                                    <input type="date" id="workoutDateCustom" class="calendar-only" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0;">
+                                    <input type="date" id="workoutDateCustom" class="calendar-only">
                                 </div>
                             </div>
                         </div>
@@ -867,11 +873,11 @@
                             <label>Date</label>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 <select id="weightDateSelect" required style="flex: 1;"></select>
-                                <div style="position: relative; width: 3rem; height: 3rem; flex: 0 0 auto;">
-                                    <button type="button" style="width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; margin: 0;">
+                                <div style="position: relative; width: 3rem; height: 3rem; flex: 0 0 auto; display: flex; align-items: center; justify-content: center;">
+                                    <button type="button" style="width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; margin: 0; position: relative; z-index: 1;">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                     </button>
-                                    <input type="date" id="weightDateCustom" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0;">
+                                    <input type="date" id="weightDateCustom" class="calendar-only">
                                 </div>
                             </div>
                         </div>
