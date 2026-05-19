@@ -67,6 +67,10 @@ class handler(BaseHTTPRequestHandler):
                 self.send_json_response(200, {"status": "success"})
             
             else:
+                # Edge casing: Prevent negative values
+                if int(payload['age']) < 0 or float(payload['weight']) < 0 or float(payload['height']) < 0 or int(payload['bmr']) < 0 or int(payload['target_calories']) < 0:
+                    return self.send_json_response(400, {"status": "error", "message": "Biometric values cannot be negative"})
+
                 # add_user.py
                 user_id = payload.get('user_id')
                 if user_id:

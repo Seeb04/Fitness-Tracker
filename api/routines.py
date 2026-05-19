@@ -60,6 +60,9 @@ class handler(BaseHTTPRequestHandler):
                 cursor.execute("INSERT INTO RoutineDays (RoutineID, DayName, DayOrder) VALUES (%s, %s, %s)", (routine_id, day['day_name'], day_index + 1))
                 day_id = cursor.lastrowid
                 for ex in day.get('exercises', []):
+                    # Edge casing: Prevent negative values for sets
+                    if int(ex['sets']) < 0:
+                        raise Exception("Sets cannot be negative")
                     cursor.execute("INSERT INTO RoutineExercises (DayID, ExerciseID, TargetSets, TargetReps) VALUES (%s, %s, %s, %s)", (day_id, ex['exercise_id'], ex['sets'], ex['reps']))
 
             connection.commit()

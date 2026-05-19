@@ -597,7 +597,14 @@
                 <div class="card">
                     <h2 style="display: flex; justify-content: space-between; align-items: center;">
                         <span>Weight Timeline</span>
-                        <button class="btn-mini" onclick="quickLogWeightPrompt()" style="margin-top: 0; width: auto; background: var(--primary); color: white; padding: 0.4rem 0.8rem;">+ Log Today</button>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <select id="weightRangeSelector" onchange="loadWeightHistory()" style="width: auto; padding: 0.3rem 0.6rem; font-size: 0.75rem; background: var(--surface-hover); border: var(--border-subtle); height: 28px;">
+                                <option value="7">7 Days</option>
+                                <option value="30" selected>30 Days</option>
+                                <option value="all">All Time</option>
+                            </select>
+                            <button class="btn-mini" onclick="quickLogWeightPrompt()" style="margin-top: 0; width: auto; background: var(--primary); color: white; padding: 0.4rem 0.8rem; height: 28px; line-height: 1;">+ Log Today</button>
+                        </div>
                     </h2>
                     <div class="chart-container">
                         <canvas id="weightChart"></canvas>
@@ -641,7 +648,13 @@
                         </div>
                         <div class="form-group">
                             <label>Date</label>
-                            <input type="date" id="mealDate" required>
+                            <div style="position: relative; display: flex; align-items: center; gap: 0.5rem;">
+                                <select id="mealDate" required style="flex: 1;"></select>
+                                <div style="position: relative; width: 40px; height: 38px; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 1.2rem;">📅</span>
+                                    <input type="date" id="mealDateCustom" class="calendar-only" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0;">
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Food Item</label>
@@ -649,20 +662,20 @@
                         </div>
                         <div class="form-group">
                             <label>Total Calories</label>
-                            <input type="number" id="mealCals" required>
+                            <input type="number" min="0" id="mealCals" required>
                         </div>
                         <div style="display: flex; gap: 0.8rem;">
                             <div class="form-group" style="flex: 1;">
                                 <label>Pro (g)</label>
-                                <input type="number" id="mealProtein" value="0">
+                                <input type="number" min="0" id="mealProtein" value="0">
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label>Carb (g)</label>
-                                <input type="number" id="mealCarbs" value="0">
+                                <input type="number" min="0" id="mealCarbs" value="0">
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label>Fat (g)</label>
-                                <input type="number" id="mealFats" value="0">
+                                <input type="number" min="0" id="mealFats" value="0">
                             </div>
                         </div>
                         <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
@@ -713,7 +726,13 @@
                     <form id="workoutForm">
                         <div class="form-group">
                             <label>Date</label>
-                            <input type="date" id="workoutDate" required>
+                            <div style="position: relative; display: flex; align-items: center; gap: 0.5rem;">
+                                <select id="workoutDate" required style="flex: 1;"></select>
+                                <div style="position: relative; width: 40px; height: 38px; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 1.2rem;">📅</span>
+                                    <input type="date" id="workoutDateCustom" class="calendar-only" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0;">
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Category / Day</label>
@@ -724,11 +743,11 @@
                         <div style="display: flex; gap: 1rem;">
                             <div class="form-group" style="flex: 1;">
                                 <label>Duration (min)</label>
-                                <input type="number" id="workoutDuration" required>
+                                <input type="number" min="0" id="workoutDuration" required>
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label>Energy Burned</label>
-                                <input type="number" id="workoutCals" required>
+                                <input type="number" min="0" id="workoutCals" required>
                             </div>
                         </div>
                         <button type="submit">Log Session</button>
@@ -752,6 +771,17 @@
                             <label>Routine Name</label>
                             <input type="text" id="routineName" placeholder="e.g., 6-Week Hypertrophy" required>
                         </div>
+
+                        <!-- Add Custom Exercise Sub-form -->
+                        <div style="background: #09090b; border: var(--border-subtle); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 0.9rem; margin-top: 0; color: var(--primary);">+ Create New Movement</h3>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <input type="text" id="newExName" placeholder="Exercise Name (e.g., Bench Press)" style="flex: 2; min-width: 150px; padding: 0.5rem;">
+                                <input type="text" id="newExMuscle" placeholder="Muscle Group (e.g., Chest)" style="flex: 1; min-width: 120px; padding: 0.5rem;">
+                                <button type="button" onclick="addCustomExercise()" style="padding: 0.5rem 1rem; background: var(--primary); color: white; width: auto; margin-top: 0;">Add</button>
+                            </div>
+                        </div>
+
                         <div id="routineDaysContainer"></div>
                         <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
                             <button type="button" onclick="addRoutineDay()" style="background: transparent; border: 1px dashed var(--primary); color: var(--primary);">+ Add Day</button>
@@ -790,7 +820,7 @@
                         <div style="display: flex; gap: 1rem;">
                             <div class="form-group" style="flex: 1;">
                                 <label>Age</label>
-                                <input type="number" id="userAge" placeholder="--" required>
+                                <input type="number" min="0" id="userAge" placeholder="--" required>
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label>Gender</label>
@@ -803,11 +833,11 @@
                         <div style="display: flex; gap: 1rem;">
                             <div class="form-group" style="flex: 1;">
                                 <label>Weight (kg)</label>
-                                <input type="number" step="0.1" id="userWeight" placeholder="--" required>
+                                <input type="number" min="0" step="0.1" id="userWeight" placeholder="--" required>
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label>Height (cm)</label>
-                                <input type="number" step="0.1" id="userHeight" placeholder="--" required>
+                                <input type="number" min="0" step="0.1" id="userHeight" placeholder="--" required>
                             </div>
                         </div>
                         <div class="form-group">
@@ -820,7 +850,7 @@
                         </div>
                         <div class="form-group">
                             <label>Manual Calorie Target</label>
-                            <input type="number" id="manualTarget" placeholder="Leave empty for auto-calculation">
+                            <input type="number" min="0" id="manualTarget" placeholder="Leave empty for auto-calculation">
                         </div>
                         <button type="submit">Sync Profile</button>
                         <button type="button" id="btnNewUser" style="background: transparent; color: var(--text-muted); border: var(--border-subtle); margin-top: 0.8rem;">Initialize New Profile</button>
@@ -843,7 +873,7 @@
                         </div>
                         <div class="form-group">
                             <label>Current Mass (kg)</label>
-                            <input type="number" step="0.1" id="logWeightVal" placeholder="--" required>
+                            <input type="number" min="0" step="0.1" id="logWeightVal" placeholder="--" required>
                         </div>
                         <button type="submit">Log Weight</button>
                     </form>
@@ -874,33 +904,41 @@
         };
 
         const today = getLocalDateString();
-        document.getElementById('mealDate').value = today;
-        document.getElementById('workoutDate').value = today;
 
-        function populateWeightDates() {
-            const select = document.getElementById('weightDateSelect');
-            if (!select) return;
-            select.innerHTML = '';
-            for (let i = 0; i < 7; i++) {
-                const d = new Date(); d.setDate(d.getDate() - i);
-                const ds = getLocalDateString(d);
-                const opt = document.createElement('option');
-                opt.value = ds;
-                opt.innerText = i === 0 ? "Today" : i === 1 ? "Yesterday" : formatFullDate(ds);
-                select.appendChild(opt);
-            }
+        function populateDateSelectors() {
+            const selectors = ['weightDateSelect', 'mealDate', 'workoutDate'];
+            selectors.forEach(id => {
+                const select = document.getElementById(id);
+                if (!select) return;
+                select.innerHTML = '';
+                for (let i = 0; i < 7; i++) {
+                    const d = new Date(); d.setDate(d.getDate() - i);
+                    const ds = getLocalDateString(d);
+                    const opt = document.createElement('option'); opt.value = ds;
+                    opt.innerText = i === 0 ? "Today" : i === 1 ? "Yesterday" : formatFullDate(ds);
+                    select.appendChild(opt);
+                }
+            });
         }
 
-        document.getElementById('weightDateCustom').addEventListener('change', (e) => {
-            const val = e.target.value; if (!val) return;
-            const select = document.getElementById('weightDateSelect');
-            let exists = Array.from(select.options).some(o => o.value === val);
-            if (!exists) {
-                const opt = document.createElement('option'); opt.value = val; opt.innerText = formatFullDate(val);
-                select.insertBefore(opt, select.firstChild);
-            }
-            select.value = val;
-        });
+        const setupCustomDateListener = (inputId, selectId) => {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            input.addEventListener('change', (e) => {
+                const val = e.target.value; if (!val) return;
+                const select = document.getElementById(selectId);
+                let exists = Array.from(select.options).some(o => o.value === val);
+                if (!exists) {
+                    const opt = document.createElement('option'); opt.value = val; opt.innerText = formatFullDate(val);
+                    select.insertBefore(opt, select.firstChild);
+                }
+                select.value = val;
+            });
+        };
+
+        setupCustomDateListener('weightDateCustom', 'weightDateSelect');
+        setupCustomDateListener('mealDateCustom', 'mealDate');
+        setupCustomDateListener('workoutDateCustom', 'workoutDate');
 
         function quickLogWeightPrompt() {
             const weight = prompt(`Enter your weight for today (${formatFullDate(today)}):`);
@@ -1127,17 +1165,74 @@
         function renderWeightChart(dates, weights) {
             const ctx = document.getElementById('weightChart').getContext('2d');
             if (weightChartInstance) weightChartInstance.destroy();
+            
+            // X-axis: Just day name
+            const dayLabels = dates.map(d => {
+                const parts = d.split(', ');
+                return parts[0].substring(0, 3); // 'Monday' -> 'Mon'
+            });
+
             weightChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates,
-                    datasets: [{ label: 'Weight (kg)', data: weights, borderColor: '#14b8a6', backgroundColor: 'rgba(20, 184, 166, 0.1)', borderWidth: 3, fill: true, tension: 0.4 }]
+                    labels: dayLabels,
+                    datasets: [{ label: 'Weight (kg)', data: weights, borderColor: '#14b8a6', backgroundColor: 'rgba(20, 184, 166, 0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255, 255, 255, 0.05)' } } } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: (tooltipItems) => {
+                                    return dates[tooltipItems[0].dataIndex]; // Show full date in tooltip
+                                }
+                            }
+                        }
+                    }, 
+                    scales: { 
+                        x: { grid: { display: false } }, 
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' } } 
+                    } 
+                }
             });
         }
 
-        function fetchMasterExercises() { fetch('/api/workouts?action=exercises').then(res => res.json()).then(data => { if(data.status === "success") masterExercises = data.data; }); }
+        function addCustomExercise() {
+            const name = document.getElementById('newExName').value;
+            const muscle = document.getElementById('newExMuscle').value;
+            if (!name || !muscle) return showToast("Name and Muscle Group required", "error");
+            
+            fetch('/api/workouts?action=add_exercise', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, muscle_group: muscle })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showToast("Exercise created!");
+                    document.getElementById('newExName').value = '';
+                    document.getElementById('newExMuscle').value = '';
+                    fetchMasterExercises();
+                } else {
+                    showToast(data.message, "error");
+                }
+            });
+        }
+
+        function fetchMasterExercises() {
+            fetch('/api/workouts?action=exercises')
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    masterExercises = data.data;
+                    // Re-render any existing selects if needed? 
+                    // Usually we just refresh the data for future addExerciseToDay calls
+                }
+            });
+        }
 
         function addRoutineDay(defaultName = '') {
             routineDayCount++; const dayId = routineDayCount;
@@ -1153,10 +1248,28 @@
         function addExerciseToDay(dayId, exName = '', sets = '', reps = '') {
             const exContainer = document.getElementById(`exercises-for-day-${dayId}`);
             const exDiv = document.createElement('div'); exDiv.className = 'builder-exercise';
-            let options = '<option value="">Select Movement...</option>'; let targetExId = '';
-            masterExercises.forEach(ex => { options += `<option value="${ex.ExerciseID}">${ex.Name} (${ex.MuscleGroup})</option>`; if (ex.Name === exName) targetExId = ex.ExerciseID; });
+            
+            // Group exercises by muscle group
+            const groups = {};
+            masterExercises.forEach(ex => {
+                if (!groups[ex.MuscleGroup]) groups[ex.MuscleGroup] = [];
+                groups[ex.MuscleGroup].push(ex);
+            });
+
+            let options = '<option value="">Select Movement...</option>';
+            let targetExId = '';
+            
+            Object.keys(groups).sort().forEach(group => {
+                options += `<optgroup label="${group}">`;
+                groups[group].sort((a,b) => a.Name.localeCompare(b.Name)).forEach(ex => {
+                    options += `<option value="${ex.ExerciseID}">${ex.Name}</option>`;
+                    if (ex.Name === exName) targetExId = ex.ExerciseID;
+                });
+                options += `</optgroup>`;
+            });
+
             exDiv.innerHTML = `<select class="ex-id" required style="flex: 2; padding: 0.5rem;">${options}</select>
-                <input type="number" class="ex-sets" placeholder="Sets" value="${sets}" required style="flex: 1; padding: 0.5rem;">
+                <input type="number" min="0" class="ex-sets" placeholder="Sets" value="${sets}" required style="flex: 1; padding: 0.5rem;">
                 <input type="text" class="ex-reps" placeholder="Reps" value="${reps}" required style="flex: 1; padding: 0.5rem;">
                 <button type="button" class="btn-delete" style="padding: 0.5rem;" onclick="this.parentElement.remove()">X</button>`;
             exContainer.appendChild(exDiv); if (targetExId) exContainer.lastElementChild.querySelector('.ex-id').value = targetExId;
@@ -1245,7 +1358,14 @@
                 if (day) {
                     let html = '<strong>Target Exercises:</strong><br><br>';
                     day.exercises.forEach(ex => {
-                        html += `• ${ex.ExerciseName}: ${ex.TargetSets} x ${ex.TargetReps}<br>`;
+                        html += `
+                        <div class="builder-exercise" style="margin-bottom: 0.5rem; opacity: 0.9;">
+                            <input type="text" value="${ex.ExerciseName}" readonly style="flex: 2; background: transparent; border: var(--border-subtle); color: var(--text-light); padding: 0.5rem;">
+                            <div style="display: flex; gap: 0.3rem; flex: 1;">
+                                <input type="text" value="${ex.TargetSets} sets" readonly style="width: 100%; background: transparent; border: var(--border-subtle); color: var(--text-muted); padding: 0.5rem; text-align: center;">
+                                <input type="text" value="${ex.TargetReps} reps" readonly style="width: 100%; background: transparent; border: var(--border-subtle); color: var(--text-muted); padding: 0.5rem; text-align: center;">
+                            </div>
+                        </div>`;
                     });
                     container.innerHTML = html;
                     container.style.display = 'block';
@@ -1288,7 +1408,8 @@
 
         function loadWeightHistory() {
             if (!currentUserId) return;
-            fetch(`/api/weight?user_id=${currentUserId}`).then(res => res.json()).then(data => {
+            const range = document.getElementById('weightRangeSelector').value;
+            fetch(`/api/weight?user_id=${currentUserId}&days=${range}`).then(res => res.json()).then(data => {
                 if(data.status === "success") { 
                     const labels = data.data.map(w => formatFullDate(w.LogDate)).reverse();
                     const weights = data.data.map(w => w.WeightKG).reverse();
@@ -1416,7 +1537,7 @@
                 loadRecipes();
             }
         }
-        window.onload = () => { fetchMasterExercises(); loadUserList(); populateWeightDates(); };
+        window.onload = () => { fetchMasterExercises(); loadUserList(); populateDateSelectors(); };
     </script>
 </body>
 </html>

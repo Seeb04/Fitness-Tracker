@@ -50,9 +50,30 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
+            query_params = parse_qs(urlparse(self.path).query)
+            action = query_params.get('action', [None])[0]
+            
             content_length = int(self.headers['Content-Length'])
             payload = json.loads(self.rfile.read(content_length).decode('utf-8'))
+
+            connection = get_db_connection()
+            cursor = connection.cursor()
+
+            if action == 'add_exercise':
+                name = payload.get('name')
+                muscle_group = payload.get('muscle_group')
+                if not name or not muscle_group:
+                    return self.send_json_response(400, {"status": "error", "message": "Name and Muscle Group required"})
+                
+                cursor.execute("INSERT INTO Exercises (Name, MuscleGroup) VALUES (%s, %s)", (name, muscle_group))
+                connection.commit()
+                return self.send_json_response(200, {"status": "success", "message": "Exercise added!"})
+
             user_id = payload.get('user_id')
+
+            # Edge casing: Prevent negative values
+            if int(payload['duration']) < 0 or int(payload['calories']) < 0:
+                return self.send_json_response(400, {"status": "error", "message": "Workout values cannot be negative"})
 
             connection = get_db_connection()
             cursor = connection.cursor()

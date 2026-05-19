@@ -8,11 +8,18 @@ class handler(BaseHTTPRequestHandler):
         try:
             query_params = parse_qs(urlparse(self.path).query)
             user_id = query_params.get('user_id', ['1'])[0]
+            days = query_params.get('days', [None])[0]
 
             connection = get_db_connection()
             cursor = connection.cursor(dictionary=True)
             
-            cursor.execute("SELECT DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, WeightKG FROM WeightLogs WHERE UserID = %s ORDER BY LogDate DESC LIMIT 30", (user_id,))
+            if days and days != 'all':
+                query = "SELECT DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, WeightKG FROM WeightLogs WHERE UserID = %s AND LogDate >= DATE_SUB(CURDATE(), INTERVAL %s DAY) ORDER BY LogDate DESC"
+                cursor.execute(query, (user_id, int(days)))
+            else:
+                query = "SELECT DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, WeightKG FROM WeightLogs WHERE UserID = %s ORDER BY LogDate DESC LIMIT 100"
+                cursor.execute(query, (user_id,))
+                
             weights = cursor.fetchall()
             for w in weights: w['WeightKG'] = float(w['WeightKG'])
             
@@ -30,6 +37,10 @@ class handler(BaseHTTPRequestHandler):
             content_length = int(self.headers['Content-Length'])
             payload = json.loads(self.rfile.read(content_length).decode('utf-8'))
             user_id = payload.get('user_id', 1)
+
+            # Edge casing: Prevent negative values
+            if float(payload['weight']) < 0:
+                return self.send_json_response(400, {"status": "error", "message": "Weight cannot be negative"})
 
             connection = get_db_connection()
             cursor = connection.cursor()

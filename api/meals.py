@@ -7,37 +7,14 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             query_params = parse_qs(urlparse(self.path).query)
-            user_id = query_params.get('user_id', [None])[0]
-            days = query_params.get('days', [None])[0]
+            user_id = query_params.get('user_id', ['1'])[0]
 
             connection = get_db_connection()
             cursor = connection.cursor(dictionary=True)
             
-            # If days is provided, we filter by the last X days
-            # If not, we return a larger set (e.g., last 100) to ensure the UI has enough history
-            if days:
-                query = """
-                    SELECT MealID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
-                        FoodItem, Calories, ProteinGrams, CarbsGrams, FatsGrams 
-                    FROM Meals 
-                    WHERE UserID = %s 
-                    AND LogDate >= DATE_SUB(CURDATE(), INTERVAL %s DAY)
-                    ORDER BY LogDate DESC, MealID DESC
-                """
-                cursor.execute(query, (user_id, int(days)))
-            else:
-                query = """
-                    SELECT MealID, DATE_FORMAT(LogDate, '%Y-%m-%d') as LogDate, 
-                        FoodItem, Calories, ProteinGrams, CarbsGrams, FatsGrams 
-                    FROM Meals 
-                    WHERE UserID = %s 
-                    ORDER BY LogDate DESC, MealID DESC 
-                    LIMIT 200
-                """
-                cursor.execute(query, (user_id,))
-                
-            meals = cursor.fetchall()
-            self.send_json_response(200, {"status": "success", "data": meals})
+            cursor.execute("SELECT RecipeID, RecipeName, Calories, ProteinGrams, CarbsGrams, FatsGrams FROM Recipes WHERE UserID = %s", (user_id,))
+            recipes = cursor.fetchall()
+            self.send_json_response(200, {"status": "success", "data": recipes})
 
         except Exception as e:
             self.send_json_response(500, {"status": "error", "message": str(e)})
@@ -50,10 +27,34 @@ class handler(BaseHTTPRequestHandler):
         try:
             content_length = int(self.headers['Content-Length'])
             payload = json.loads(self.rfile.read(content_length).decode('utf-8'))
-            user_id = payload.get('user_id')
+            user_id = payload.get('user_id', 1)
 
             connection = get_db_connection()
             cursor = connection.cursor()
+
+            # Edge casing: Prevent negative values
+            if int(payload['calories']) < 0 or int(payload.get('protein', 0)) < 0 or int(payload.get('carbs', 0)) < 0 or int(payload.get('fats', 0)) < 0:
+                return self.send_json_response(400, {"status": "error", "message": "Nutritional values cannot be negative"})
+
+            insert_query = "INSERT INTO Recipes (UserID, RecipeName, Calories, ProteinGrams, CarbsGrams, FatsGrams) VALUES (%s, %s, %s, %s, %s, %s)"
+            cursor.execute(insert_query, (user_id, payload['recipe_name'], int(payload['calories']), int(payload.get('protein', 0)), int(payload.get('carbs', 0)), int(payload.get('fats', 0))))
+            connection.commit()
+
+            self.send_json_response(200, {"status": "success", "message": "Recipe added!"})
+
+        except Exception as e:
+            self.send_json_response(500, {"status": "error", "message": str(e)})
+        finally:
+            if 'connection' in locals() and connection.is_connected():
+                cursor.close()
+                connection.close()
+
+    def send_json_response(self, status, data):
+        self.send_response(status)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode('utf-8'))
+ritional values cannot be negative"})
 
             insert_query = """
                 INSERT INTO Meals (UserID, LogDate, FoodItem, Calories, ProteinGrams, CarbsGrams, FatsGrams) 
