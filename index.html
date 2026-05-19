@@ -650,8 +650,10 @@
                             <label>Date</label>
                             <div style="position: relative; display: flex; align-items: center; gap: 0.5rem;">
                                 <select id="mealDate" required style="flex: 1;"></select>
-                                <div style="position: relative; width: 40px; height: 38px; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                                    <span style="font-size: 1.2rem;">📅</span>
+                                <div style="position: relative; width: 3rem; height: 3rem; flex: 0 0 auto;">
+                                    <button type="button" style="width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; margin: 0;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                    </button>
                                     <input type="date" id="mealDateCustom" class="calendar-only" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0;">
                                 </div>
                             </div>
@@ -728,8 +730,10 @@
                             <label>Date</label>
                             <div style="position: relative; display: flex; align-items: center; gap: 0.5rem;">
                                 <select id="workoutDate" required style="flex: 1;"></select>
-                                <div style="position: relative; width: 40px; height: 38px; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                                    <span style="font-size: 1.2rem;">📅</span>
+                                <div style="position: relative; width: 3rem; height: 3rem; flex: 0 0 auto;">
+                                    <button type="button" style="width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-hover); border: var(--border-subtle); border-radius: 8px; margin: 0;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                    </button>
                                     <input type="date" id="workoutDateCustom" class="calendar-only" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0;">
                                 </div>
                             </div>
@@ -948,7 +952,7 @@
             }
         }
 
-        let currentUserId = null; // Always require login on refresh for testing
+        // let currentUserId = null; // Always require login on refresh for testing
         localStorage.removeItem('selectedUserId');
 
         let userStats = { bmr: 0, target: 0, goal: 'Maintain', current: {} };
@@ -1049,8 +1053,8 @@
             const passcode = document.getElementById('authPasscode').value;
             if (!usernameInput || !passcode) return showToast("Enter username and passcode", "error");
 
-            console.log("Attempting login for:", usernameInput);
-            console.log("Available users:", masterUserList.map(u => u.Username));
+            // console.log("Attempting login for:", usernameInput);
+            // console.log("Available users:", masterUserList.map(u => u.Username));
 
             const matchedUser = masterUserList.find(u => u.Username.toLowerCase() === usernameInput.toLowerCase());
             if (!matchedUser) {
