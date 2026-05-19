@@ -954,7 +954,19 @@
             const weight = prompt(`Enter your weight for today (${formatFullDate(today)}):`);
             if (weight && !isNaN(weight)) {
                 fetch('/api/weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, date: today, weight: parseFloat(weight) }) })
-                .then(() => { showToast("Weight logged!"); loadDashboardData(); });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        showToast("Weight logged!");
+                        loadDashboardData();
+                    } else {
+                        showToast(data.message || "Failed to log weight", "error");
+                    }
+                })
+                .catch(err => {
+                    console.error("Error logging weight:", err);
+                    showToast("Connection error", "error");
+                });
             }
         }
 
@@ -1329,13 +1341,31 @@
                 if(exercises.length > 0) days.push({ day_name: dayName, exercises: exercises });
             });
             fetch('/api/routines', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, routine_name: name, days: days }) })
-            .then(res => res.json()).then(data => { if(data.status === "success") { showToast("Protocol activated!"); loadDashboardWidget(); } });
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showToast("Protocol activated!");
+                    loadDashboardWidget();
+                } else {
+                    showToast(data.message || "Failed to save protocol", "error");
+                }
+            })
+            .catch(err => showToast("Connection error", "error"));
         });
 
         function quickLogWorkout(dayName) {
             const p = { user_id: currentUserId, date: today, category: dayName, duration: 60, calories: 300 };
             fetch('/api/workouts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
-            .then(() => { showToast(`${dayName} logged!`); loadDashboardData(); });
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showToast(`${dayName} logged!`);
+                    loadDashboardData();
+                } else {
+                    showToast(data.message || "Failed to log workout", "error");
+                }
+            })
+            .catch(err => showToast("Connection error", "error"));
         }
 
         function loadDashboardWidget() {
@@ -1449,7 +1479,17 @@
             const name = document.getElementById('foodItem').value; const cals = document.getElementById('mealCals').value;
             if (!name || !cals) return showToast("Name and Calories required", "error");
             const payload = { user_id: currentUserId, recipe_name: name, calories: parseInt(cals), protein: parseInt(document.getElementById('mealProtein').value || 0), carbs: parseInt(document.getElementById('mealCarbs').value || 0), fats: parseInt(document.getElementById('mealFats').value || 0) };
-            fetch('/api/recipes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(() => { showToast("Recipe saved"); loadRecipes(); });
+            fetch('/api/recipes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showToast("Recipe saved");
+                    loadRecipes();
+                } else {
+                    showToast(data.message || "Failed to save recipe", "error");
+                }
+            })
+            .catch(err => showToast("Connection error", "error"));
         });
 
         document.getElementById('weightForm').addEventListener('submit', function(e) {
@@ -1457,7 +1497,16 @@
             const val = document.getElementById('logWeightVal').value;
             const date = document.getElementById('weightDateSelect').value;
             fetch('/api/weight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId, date: date, weight: parseFloat(val) }) })
-            .then(() => { showToast("Weight logged"); loadDashboardData(); });
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showToast("Weight logged");
+                    loadDashboardData();
+                } else {
+                    showToast(data.message || "Failed to log weight", "error");
+                }
+            })
+            .catch(err => showToast("Connection error", "error"));
         });
 
         function loadWeightHistory() {
@@ -1480,12 +1529,34 @@
 
         document.getElementById('mealForm').addEventListener('submit', function(e) {
             e.preventDefault(); const p = { user_id: currentUserId, date: document.getElementById('mealDate').value, food: document.getElementById('foodItem').value, calories: parseInt(document.getElementById('mealCals').value || 0), protein: parseInt(document.getElementById('mealProtein').value || 0), carbs: parseInt(document.getElementById('mealCarbs').value || 0), fats: parseInt(document.getElementById('mealFats').value || 0) };
-            fetch('/api/meals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }).then(() => { showToast("Nutrition logged"); selectedDate = p.date; loadMeals(selectedDate); loadDashboardData(); });
+            fetch('/api/meals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showToast("Nutrition logged");
+                    selectedDate = p.date;
+                    loadMeals(selectedDate);
+                    loadDashboardData();
+                } else {
+                    showToast(data.message || "Failed to log nutrition", "error");
+                }
+            })
+            .catch(err => showToast("Connection error", "error"));
         });
 
         document.getElementById('workoutForm').addEventListener('submit', function(e) {
             e.preventDefault(); const p = { user_id: currentUserId, date: document.getElementById('workoutDate').value, category: document.getElementById('workoutCategory').value, duration: parseInt(document.getElementById('workoutDuration').value || 0), calories: parseInt(document.getElementById('workoutCals').value || 0) };
-            fetch('/api/workouts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }).then(() => { showToast("Activity logged"); loadDashboardData(); });
+            fetch('/api/workouts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showToast("Activity logged");
+                    loadDashboardData();
+                } else {
+                    showToast(data.message || "Failed to log activity", "error");
+                }
+            })
+            .catch(err => showToast("Connection error", "error"));
         });
 
         function loadMeals(targetDate = null) {
